@@ -16,6 +16,7 @@ import androidx.appcompat.app.AppCompatDelegate
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.viewModelScope
 import de.marmaro.krt.ffupdater.InstallActivity.State.*
 import de.marmaro.krt.ffupdater.R.id.install_activity__exception__show_button
 import de.marmaro.krt.ffupdater.R.string.crash_report__explain_text__install_activity_fetching_url
@@ -33,6 +34,7 @@ import de.marmaro.krt.ffupdater.settings.SettingsHelper
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 
 /**
@@ -114,11 +116,7 @@ class InstallActivity : AppCompatActivity() {
         }
         viewModel.app = app
         // only start new download if no download is still running (can happen after rotation)
-        if (viewModel.fileDownloader?.isRunning == true) {
-            restartStateMachine(REUSE_CURRENT_DOWNLOAD)
-        } else {
-            restartStateMachine(START)
-        }
+        restartStateMachine(START)
     }
 
     override fun onStop() {
@@ -301,6 +299,10 @@ class InstallActivity : AppCompatActivity() {
             if (ia.appCache.isAvailable(ia, updateCheckResult.availableResult)) {
                 return USE_CACHED_DOWNLOADED_APK
             }
+
+            if (ia.viewModel.fileDownloader?.currentDownloadResult != null) {
+                return REUSE_CURRENT_DOWNLOAD
+            }
             return START_DOWNLOAD
         }
 
@@ -315,13 +317,12 @@ class InstallActivity : AppCompatActivity() {
                     R.id.downloadingFileText,
                     ia.getString(R.string.install_activity__download_app_with_status, text)
                 )
-                println("normal $text")
             }
             val fileDownloader = FileDownloader()
             fileDownloader.onProgress = { percentage ->
                 ia.runOnUiThread {
                     ia.findViewById<ProgressBar>(R.id.downloadingFileProgressBar).progress = percentage
-                    setDownloadingFileText("$percentage %")
+                    setDownloadingFileText("$percentage%")
                 }
             }
             ia.viewModel.fileDownloader = fileDownloader
@@ -329,7 +330,11 @@ class InstallActivity : AppCompatActivity() {
 
             val url = updateCheckResult.availableResult.downloadUrl
             val file = ia.appCache.getFile(ia)
-            val result = fileDownloader.downloadFile(url, file)
+
+            // download coroutine should survive a screen rotation and should live as long as the view model
+            val result = withContext(ia.viewModel.viewModelScope.coroutineContext) {
+                fileDownloader.downloadFile(url, file)
+            }
 
             if (result) {
                 return DOWNLOAD_WAS_SUCCESSFUL
@@ -338,7 +343,7 @@ class InstallActivity : AppCompatActivity() {
         }
 
         @MainThread
-        fun reuseCurrentDownload(ia: InstallActivity): State {
+        suspend fun reuseCurrentDownload(ia: InstallActivity): State {
             val updateCheckResult = requireNotNull(ia.viewModel.updateCheckResult)
             ia.show(R.id.downloadingFile)
             ia.setText(R.id.downloadingFileUrl, updateCheckResult.downloadUrl)
@@ -347,7 +352,6 @@ class InstallActivity : AppCompatActivity() {
                     R.id.downloadingFileText,
                     ia.getString(R.string.install_activity__download_app_with_status, text)
                 )
-                println("reuse: $text")
             }
             val fileDownloader = requireNotNull(ia.viewModel.fileDownloader)
             fileDownloader.onProgress = { percentage ->
@@ -356,9 +360,12 @@ class InstallActivity : AppCompatActivity() {
                     setDownloadingFileText("$percentage %")
                 }
             }
-            fileDownloader.onSuccess = { ia.restartStateMachine(DOWNLOAD_WAS_SUCCESSFUL) }
-            fileDownloader.onFailure = { ia.restartStateMachine(FAILURE_DOWNLOAD_UNSUCCESSFUL) }
-            return SUCCESS_PAUSE
+
+            val success = fileDownloader.currentDownloadResult?.await() ?: false
+            if (success) {
+                return DOWNLOAD_WAS_SUCCESSFUL
+            }
+            return FAILURE_DOWNLOAD_UNSUCCESSFUL
         }
 
         @MainThread
