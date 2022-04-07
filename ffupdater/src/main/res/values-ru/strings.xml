@@ -19,7 +19,6 @@
     <string name="bromite__warning">Bromite основан на Google Chrome (Chromium) - некоторым людям это не нравится. Хотите установить Bromite?</string>
     <string name="but_was">Но был:</string>
     <string name="crash_report__copy_crash_report_to_clipboard">Скопируйте отчет о сбое в буфер обмена</string>
-    <string name="crash_report__explain_text__background_job">Во время фоновой проверки на ошибки произошла следующая ошибка. Если эта ошибка возникает часто, не стесняйтесь сообщить о ней на notabug.org, GitHub или GitLab. Пожалуйста, не забудьте добавить отчет о сбое из буфера обмена и описание того, как вы воспроизвели эту ошибку.</string>
     <string name="crash_report__explain_text__install_activity_fetching_url">При получении URL-адреса загрузки произошла следующая ошибка. Если эта ошибка возникает часто, не стесняйтесь сообщить о ней на notabug.org, GitHub или GitLab. Пожалуйста, не забудьте добавить отчет о сбое из буфера обмена и описание того, как вы воспроизвели эту ошибку.</string>
     <string name="crash_report__explain_text__main_activity_update_check">При проверке обновлений в окне приложения произошла следующая ошибка. Если эта ошибка возникает часто, не стесняйтесь сообщать о ней на notabug.org, GitHub или GitLab. Пожалуйста, не забудьте добавить отчет о сбое из буфера обмена и описание того, как вы воспроизвели эту ошибку.</string>
     <string name="crash_report__explain_text__uncaught_throwable">К сожалению, программа FFUpdater потерпела крах. Пожалуйста, сообщите об этой ошибке на notabug.org, GitHub или GitLab. Добавьте к сообщению отчет о сбое из буфера обмена и описание того, как воспроизвести ошибку.</string>
@@ -59,11 +58,6 @@
     <string name="install_activity__download_app_is_disabled">Необходимое системное приложение \"Менеджер загрузок\" отключено. Пожалуйста, включите его снова.</string>
     <string name="install_activity__download_app_with_status">Загрузить приложение (%1$s)</string>
     <string name="install_activity__download_failed">Не удалось загрузить</string>
-    <string name="install_activity__download_status_failed">неудачно</string>
-    <string name="install_activity__download_status_paused">приостановлено</string>
-    <string name="install_activity__download_status_pending">в ожидании</string>
-    <string name="install_activity__download_status_running">в процессе</string>
-    <string name="install_activity__download_status_success">успешно</string>
     <string name="install_activity__downloaded_application_from">Приложение загружено с:</string>
     <string name="install_activity__downloaded_application_is_not_verified">Загруженное приложение НЕ проверяется</string>
     <string name="install_activity__downloaded_application_is_verified">Загруженное приложение проверено</string>

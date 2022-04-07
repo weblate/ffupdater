@@ -19,7 +19,6 @@
     <string name="bromite__warning">Bromite utilise la base technique de Google Chrome (Chromium) - certaines personnes n\'aiment pas cela. Vous voulez installer Bromite?</string>
     <string name="but_was">Mais était:</string>
     <string name="crash_report__copy_crash_report_to_clipboard">Copier le rapport d\'erreur dans le presse-papiers</string>
-    <string name="crash_report__explain_text__background_job">L\'erreur suivante s\'est produite pendant la vérification des erreurs en arrière-plan. Si cette erreur se produit fréquemment, n\'hésitez pas à la signaler sur notabug.org, GitHub ou GitLab. N\'oubliez pas d\'ajouter votre rapport de crash du presse-papiers et la description de la façon dont vous reproduisez cette erreur.</string>
     <string name="crash_report__explain_text__install_activity_fetching_url">L\'erreur suivante s\'est produite lors de l\'extraction de l\'URL de téléchargement. Si cette erreur se produit fréquemment, n\'hésitez pas à la signaler sur notabug.org, GitHub ou GitLab. N\'oubliez pas d\'ajouter votre rapport d\'erreur du presse-papiers et la description de la façon dont vous reproduisez cette erreur.</string>
     <string name="crash_report__explain_text__main_activity_update_check">L\'erreur suivante s\'est produite lors de la vérification des mises à jour dans la vue principale. Si cette erreur se produit fréquemment, n\'hésitez pas à la signaler sur notabug.org, GitHub ou GitLab. N\'oubliez pas d\'ajouter votre rapport de crash du presse-papiers et la description de la façon dont vous reproduisez cette erreur.</string>
     <string name="crash_report__explain_text__uncaught_throwable">Malheureusement, FFUpdater s\'est planté. Veuillez signaler cette erreur sur notabug.org, GitHub ou GitLab. Ajoutez à votre problème le rapport de panne du presse-papiers et une description de la façon de reproduire le bogue.</string>
@@ -59,11 +58,6 @@
     <string name="install_activity__download_app_is_disabled">L\'application système nécessaire \"Download Manager\" est désactivée. Veuillez la réactiver.</string>
     <string name="install_activity__download_app_with_status">Télécharger l\'application (%1$s)</string>
     <string name="install_activity__download_failed">Echec du téléchargement</string>
-    <string name="install_activity__download_status_failed">échoué</string>
-    <string name="install_activity__download_status_paused">en pause</string>
-    <string name="install_activity__download_status_pending">en attente</string>
-    <string name="install_activity__download_status_running">en cours d\'exécution</string>
-    <string name="install_activity__download_status_success">succès</string>
     <string name="install_activity__downloaded_application_from">Application téléchargée à partir de:</string>
     <string name="install_activity__downloaded_application_is_not_verified">La demande téléchargée n\'est PAS vérifiée</string>
     <string name="install_activity__downloaded_application_is_verified">La demande téléchargée est vérifiée</string>

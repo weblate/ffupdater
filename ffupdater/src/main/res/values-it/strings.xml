@@ -19,7 +19,6 @@
     <string name="bromite__warning">Bromite usa la base tecnica di Google Chrome (Chromium) - ciò non piace ad alcune persone. Vuoi installare Bromite?</string>
     <string name="but_was">Ma era:</string>
     <string name="crash_report__copy_crash_report_to_clipboard">Copia il rapporto di arresto anomalo negli appunti</string>
-    <string name="crash_report__explain_text__background_job">Si è verificato il seguente errore durante il controllo degli errori in background. Se questo errore si verifica frequentemente, sentiti libero di segnalarlo su notabug.org, GitHub o GitLab. Non dimenticarti di aggiungere il tuo rapporto di arresto anomalo dagli appunti e una descrizione di come riprodurre questo errore.</string>
     <string name="crash_report__explain_text__install_activity_fetching_url">Si è verificato il seguente errore quando è stato recuperato l\'URL di download. Se questo errore si verifica frequentemente, sentiti libero di segnalarlo su notabug.org, GitHub o GitLab. Non dimenticarti di aggiungere il tuo rapporto di arresto anomalo dagli appunti e una descrizione di come riprodurre questo errore.</string>
     <string name="crash_report__explain_text__main_activity_update_check">Si è verificato il seguente errore durante il controllo degli aggiornamenti nella pagina principale. Se questo errore si verifica frequentemente, sentiti libero di segnalarlo su notabug.org, GitHub o GitLab. Non dimenticarti di aggiungere il tuo rapporto di arresto anomalo dagli appunti e una descrizione di come riprodurre questo errore.</string>
     <string name="crash_report__explain_text__uncaught_throwable">Sfortunatamente, FFUpdater si è arrestato in modo anomalo. Si prega di segnalare questo errore su notabug.org, GitHub o GitLab. Aggiungi alla tua issue il rapporto di arresto anomalo dagli appunti e una descrizione di come riprodurre questo errore.</string>
@@ -55,11 +54,6 @@
     <string name="install_activity__download_app_is_disabled">L\'app di sistema necessaria \"Gestione download\" è disabilitata. Si prega di abilitarla nuovamente.</string>
     <string name="install_activity__download_app_with_status">Download applicazione (%1$s)</string>
     <string name="install_activity__download_failed">Download fallito</string>
-    <string name="install_activity__download_status_failed">fallito</string>
-    <string name="install_activity__download_status_paused">in pausa</string>
-    <string name="install_activity__download_status_pending">in attesa</string>
-    <string name="install_activity__download_status_running">in corso</string>
-    <string name="install_activity__download_status_success">successo</string>
     <string name="install_activity__downloaded_application_from">Applicazione scaricata da:</string>
     <string name="install_activity__downloaded_application_is_not_verified">L\'applicazione scaricata NON è verificata</string>
     <string name="install_activity__downloaded_application_is_verified">L\'applicazione scaricata è verificata</string>

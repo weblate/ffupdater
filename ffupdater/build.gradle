@@ -41,7 +41,7 @@ dependencies {
 }
 
 android {
-    compileSdkVersion 31
+    compileSdkVersion 32
 
     defaultConfig {
         versionCode 93
@@ -50,7 +50,7 @@ android {
         // MINOR version when you add functionality in a backwards compatible manner, and
         // PATCH version when you make backwards compatible bug fixes.
         minSdkVersion 21
-        targetSdkVersion 31
+        targetSdkVersion 32
         vectorDrawables.useSupportLibrary = true
     }
 
