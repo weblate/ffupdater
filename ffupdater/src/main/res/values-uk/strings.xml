@@ -30,6 +30,10 @@
     <string name="device_too_old_dialog__title">Пристрій занадто старий</string>
     <string name="dialog_button__do_not_install">Ні, поверніться до \'Release\'</string>
     <string name="dialog_button__yes">Так</string>
+    <string name="download_notification__channel_description">Показує, коли оновлення програми завантажуються у фоновому режимі.</string>
+    <string name="download_notification__channel_name">Повідомлення про завантаження у фоновому режимі</string>
+    <string name="download_notification__message">Наразі завантажуються оновлення для встановлених програм у фоновому режимі.</string>
+    <string name="download_notification__title">Завантаження оновлень програми</string>
     <string name="download_the_app">завантажити додаток</string>
     <string name="error_notification__channel_description">Показати помилки перевірки фонового оновлення</string>
     <string name="error_notification__channel_name">Фонові помилки</string>
@@ -160,8 +164,4 @@
     <string name="vivaldi__description">Vivaldi - це новий приватний браузер з унікальною гнучкістю в налаштуванні. Він має такі корисні інстументи, як блокувальник реклами (вимкнений за промовчанням), захист від стеження та приватний перекладач. Нотатки та знімки сторінок прискорюють та полегшують робочий процес. Налаштування теми оформлення та вигляду й розташування вкладок додають індивідуальність браузерові. Завантажте безкоштовно та переглядайте сайти з насолодою.</string>
     <string name="vivaldi__title">Браузер Vivaldi</string>
     <string name="vivaldi__warning">Vivaldi є лише частково відкритим вихідним кодом (див. <a href="https://vivaldi.com/blog/vivaldi-browser-open-source/">https://vivaldi.com/blog/vivaldi-browser-open-source/</a> для отримання додаткової інформації). Він також використовує технічну базу Google Chrome (Chromium).\n\nДеяким людям це не до вподоби. Чи хочете ви встановити Vivaldi?</string>
-    <string name="download_notification__channel_name">Повідомлення про завантаження у фоновому режимі</string>
-    <string name="download_notification__channel_description">Показує, коли оновлення програми завантажуються у фоновому режимі.</string>
-    <string name="download_notification__title">Завантаження оновлень програми</string>
-    <string name="download_notification__message">Наразі завантажуються оновлення для встановлених програм у фоновому режимі.</string>
 </resources>

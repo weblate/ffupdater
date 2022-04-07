@@ -30,6 +30,10 @@
     <string name="device_too_old_dialog__title">Gerät ist zu alt</string>
     <string name="dialog_button__do_not_install">Nein, nicht installieren</string>
     <string name="dialog_button__yes">Ja</string>
+    <string name="download_notification__channel_description">Zeigt an, wenn App-Updates im Hintergrund heruntergeladen werden.</string>
+    <string name="download_notification__channel_name">Benachrichtigung über Downloads im Hintergrund</string>
+    <string name="download_notification__message">Derzeit werden Updates für installierte Anwendungen im Hintergrund heruntergeladen.</string>
+    <string name="download_notification__title">Herunterladen von App-Updates</string>
     <string name="download_the_app">Applikation herunterladen</string>
     <string name="error_notification__channel_description">Fehler des Hintergrund-Update-Checkers anzeigen</string>
     <string name="error_notification__channel_name">Fehler im Hintergrund</string>
@@ -160,8 +164,4 @@
     <string name="vivaldi__description">Vivaldi ist ein privater Browser mit einzigartigen Anpassungsmöglichkeiten. Es bietet viele Funktionen, wie z. B. Werbe- und Trackerblocker (standardmäßig deaktiviert), Webseitenübersetzung. Notizen und Screenshots helfen, Ihre Arbeit zu beschleunigen. Die Anpassung der Tabs, der Designthemen und des Aussehens verleihen dem System Persönlichkeit. Laden Sie Vivaldi kostenlos herunter surfen Sie mit Vergnügen im Internet.</string>
     <string name="vivaldi__title">Vivaldi Browser</string>
     <string name="vivaldi__warning">Vivaldi ist nur teilweise quelloffen (siehe <a href="https://vivaldi.com/blog/vivaldi-browser-open-source/">https://vivaldi.com/blog/vivaldi-browser-open-source/</a> für weitere Informationen). Außerdem nutzt es die technische Grundlage von Google Chrome (Chromium).\n\nManche Leute mögen das nicht. Möchten Sie Vivaldi installieren?</string>
-    <string name="download_notification__channel_name">Benachrichtigung über Downloads im Hintergrund</string>
-    <string name="download_notification__channel_description">Zeigt an, wenn App-Updates im Hintergrund heruntergeladen werden.</string>
-    <string name="download_notification__title">Herunterladen von App-Updates</string>
-    <string name="download_notification__message">Derzeit werden Updates für installierte Anwendungen im Hintergrund heruntergeladen.</string>
 </resources>
