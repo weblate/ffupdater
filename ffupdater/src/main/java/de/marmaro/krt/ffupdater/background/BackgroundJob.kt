@@ -71,8 +71,15 @@ class BackgroundJob(context: Context, workerParams: WorkerParameters) :
         }
 
         val appsWithUpdates = findAppsWithUpdates()
-        if (NetworkUtil.isActiveNetworkUnmetered(applicationContext) && StorageUtil.isEnoughStorageAvailable()) {
-            downloadUpdatesInBackground(appsWithUpdates)
+        if (NetworkUtil.isActiveNetworkUnmetered(applicationContext) &&
+            StorageUtil.isEnoughStorageAvailable() &&
+            appsWithUpdates.isNotEmpty()
+        ) {
+            NotificationBuilder.showDownloadNotification(applicationContext)
+            appsWithUpdates.forEach {
+                downloadUpdateInBackground(it)
+            }
+            NotificationBuilder.hideDownloadNotification(applicationContext)
         }
         showUpdateNotification(appsWithUpdates)
         updateLastBackgroundCheckTimestamp()
@@ -92,14 +99,6 @@ class BackgroundJob(context: Context, workerParams: WorkerParameters) :
             .filter { it.detail.isInstalled(applicationContext) }
             // nice side effect: check for updates by calling updateCheck()
             .filter { it.detail.updateCheck(applicationContext).isUpdateAvailable }
-    }
-
-    /**
-     * If the current network is unmetered, then download the update for the given apps
-     * with the DownloadManager in the background.
-     */
-    private suspend fun downloadUpdatesInBackground(appsWithUpdates: List<App>) {
-        appsWithUpdates.forEach { downloadUpdateInBackground(it) }
     }
 
     /**

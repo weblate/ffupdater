@@ -57,6 +57,24 @@ object NotificationBuilder {
         }
     }
 
+    fun showDownloadNotification(context: Context) {
+        showNotification(
+            context = context,
+            channelId = "background_downloads_notification_channel",
+            channelName = "Current background downloads",
+            channelDescription = "Shows when app updates are downloaded in the background",
+            notificationId = 400,
+            notificationTitle = "Downloading app updates",
+            notificationMessage = "Currently downloading updates for installed apps in the background.",
+            intent = null
+        )
+    }
+
+    fun hideDownloadNotification(context: Context) {
+        val notificationManager = (context.getSystemService(NOTIFICATION_SERVICE) as NotificationManager)
+        notificationManager.cancel(400)
+    }
+
     @SuppressLint("UnspecifiedImmutableFlag")
     fun showNotification(
         context: Context,
@@ -66,10 +84,9 @@ object NotificationBuilder {
         notificationId: Int,
         notificationTitle: String,
         notificationMessage: String,
-        intent: Intent,
+        intent: Intent?,
     ) {
         val notificationManager = (context.getSystemService(NOTIFICATION_SERVICE) as NotificationManager)
-        val updateAppIntent = PendingIntent.getActivity(context, 0, intent, getFlags())
         val notificationBuilder = getNotificationBuilder(
             context,
             notificationManager,
@@ -83,8 +100,11 @@ object NotificationBuilder {
             .setStyle(Notification.BigTextStyle().bigText(notificationMessage))
             .setContentTitle(notificationTitle)
             .setContentText(notificationMessage)
-            .setContentIntent(updateAppIntent)
             .setAutoCancel(true)
+        if (intent != null) {
+            val updateAppIntent = PendingIntent.getActivity(context, 0, intent, getFlags())
+            notificationBuilder.setContentIntent(updateAppIntent)
+        }
         notificationManager.notify(notificationId, notificationBuilder.build())
     }
 
