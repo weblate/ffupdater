@@ -51,7 +51,6 @@
     <string name="information_about_the_app">informazioni sull\'app</string>
     <string name="install_activity__delete_cache_button_text">svuota cache</string>
     <string name="install_activity__delete_cache_explanation">Se pensi che FFupdater abbia memorizzato nella cache un aggiornamento di app difettoso, clicca il pulsante \"svuota cache\" per eliminare la cache di questa app.</string>
-    <string name="install_activity__download_app_is_disabled">L\'app di sistema necessaria \"Gestione download\" è disabilitata. Si prega di abilitarla nuovamente.</string>
     <string name="install_activity__download_app_with_status">Download applicazione (%1$s)</string>
     <string name="install_activity__download_failed">Download fallito</string>
     <string name="install_activity__downloaded_application_from">Applicazione scaricata da:</string>

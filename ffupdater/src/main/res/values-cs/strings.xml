@@ -51,7 +51,6 @@
     <string name="information_about_the_app">informace o prohlížeči</string>
     <string name="install_activity__delete_cache_button_text">vyčistit mezipaměť</string>
     <string name="install_activity__delete_cache_explanation">Pokud si myslíte, že FFUpdater uložil do mezipaměti chybnou aktualizaci aplikace, klikněte na tlačítko \"vyčistit mezipaměť\" pro vyčištění mezipaměti pro tuto aplikaci.</string>
-    <string name="install_activity__download_app_is_disabled">Nezbytná systemová aplikace \"Správce stahování\" je zakázána. Znovu ji prosím povolte.</string>
     <string name="install_activity__download_app_with_status">Stáhování aplikace (%1$s)</string>
     <string name="install_activity__download_failed">Stahování selhalo</string>
     <string name="install_activity__downloaded_application_from">Aplikace stažená z:</string>

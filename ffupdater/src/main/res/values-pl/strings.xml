@@ -55,7 +55,6 @@
     <string name="information_about_the_app">informacje o aplikacji</string>
     <string name="install_activity__delete_cache_button_text">wyczyść pamięć podręczną</string>
     <string name="install_activity__delete_cache_explanation">Jeśli uważasz, że FFUpdater zbuforował błędną aktualizację aplikacji, kliknij przycisk \"wyczyść pamięć podręczną\", aby usunąć pamięć podręczną dla tej aplikacji.</string>
-    <string name="install_activity__download_app_is_disabled">Niezbędna aplikacja systemowa \"Menedżer pobierania\" jest wyłączona. Proszę włączyć ją ponownie.</string>
     <string name="install_activity__download_app_with_status">Pobierz aplikację (%1$s)</string>
     <string name="install_activity__download_failed">Pobieranie nie powiodło się</string>
     <string name="install_activity__downloaded_application_from">Pobrano aplikację z:</string>

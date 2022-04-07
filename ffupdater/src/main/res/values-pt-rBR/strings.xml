@@ -55,7 +55,6 @@
     <string name="information_about_the_app">detalhes sobre o app</string>
     <string name="install_activity__delete_cache_button_text">limpar cache</string>
     <string name="install_activity__delete_cache_explanation">Se você acha que o FFUpdater colocou em cache uma atualização do navegador defeituosa, clique no botão \"limpar cache\" para limpar o cache do app.</string>
-    <string name="install_activity__download_app_is_disabled">O app necessário do sistema \"Download Manager\" está desativado. Por favor, ative-o de volta.</string>
     <string name="install_activity__download_app_with_status">Baixar o (%1$s)</string>
     <string name="install_activity__download_failed">Download falhou</string>
     <string name="install_activity__downloaded_application_from">Navegador baixado do:</string>

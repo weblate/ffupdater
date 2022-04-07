@@ -55,7 +55,6 @@
     <string name="information_about_the_app">сведения за приложението</string>
     <string name="install_activity__delete_cache_button_text">Изчистване</string>
     <string name="install_activity__delete_cache_explanation">Ако смятате, че FFUpdater е съхранил във врементата памет дефектно обновяване на някое от приложенията, докоснете бутона „Изчистване“, за да го премахнете.</string>
-    <string name="install_activity__download_app_is_disabled">Необходимото системно приложение „Мениджър за изтегляне“ е изключено. Разрешете го отново.</string>
     <string name="install_activity__download_app_with_status">Изтегляне на приложение (%1$s)</string>
     <string name="install_activity__download_failed">Грешка при изтегляне</string>
     <string name="install_activity__downloaded_application_from">Приложението е изтеглено от:</string>
