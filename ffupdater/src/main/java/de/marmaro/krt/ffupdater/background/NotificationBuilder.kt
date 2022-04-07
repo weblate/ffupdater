@@ -61,11 +61,11 @@ object NotificationBuilder {
         showNotification(
             context = context,
             channelId = "background_downloads_notification_channel",
-            channelName = "Current background downloads",
-            channelDescription = "Shows when app updates are downloaded in the background",
+            channelName = context.getString(R.string.download_notification__channel_name),
+            channelDescription = context.getString(R.string.download_notification__channel_description),
             notificationId = 400,
-            notificationTitle = "Downloading app updates",
-            notificationMessage = "Currently downloading updates for installed apps in the background.",
+            notificationTitle = context.getString(R.string.download_notification__title),
+            notificationMessage = context.getString(R.string.download_notification__message),
             intent = null
         )
     }

@@ -160,4 +160,8 @@
     <string name="vivaldi__title">Браузер Vivaldi</string>
     <string name="vivaldi__warning">Исходный код Vivaldi не полностью открыт (см. <a href="https://vivaldi.com/blog/vivaldi-browser-open-source/">https://vivaldi.com/blog/vivaldi-browser-open-source/</a> для получения дополнительной информации). Он также основан на Google Chrome (Chromium).\n\nНекоторым людям это не нравится. Хотите ли вы установить Vivaldi?</string>
     <string name="settings__ony_unmetered_network_title">Только безлимитная сеть</string>
+    <string name="download_notification__channel_name">Уведомление о загрузках в фоновом режиме</string>
+    <string name="download_notification__channel_description">Показывает, когда обновления приложений загружаются в фоновом режиме.</string>
+    <string name="download_notification__title">Загрузка обновлений приложений</string>
+    <string name="download_notification__message">В настоящее время в фоновом режиме загружаются обновления для установленных приложений.</string>
 </resources>
