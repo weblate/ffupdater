@@ -2,7 +2,6 @@ package de.marmaro.krt.ffupdater
 
 import android.content.Context
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
 import android.os.Environment
@@ -190,9 +189,8 @@ class InstallActivity : AppCompatActivity() {
     @MainThread
     enum class State(val action: suspend (InstallActivity) -> State) {
         START(InstallActivity::start),
-        INSTALLED_APP_SIGNATURE_CHECKED(InstallActivity::installedAppSignatureChecked),
-        EXTERNAL_STORAGE_IS_ACCESSIBLE(InstallActivity::externalStorageIsAccessible),
-        DOWNLOAD_MANAGER_IS_ENABLED(InstallActivity::downloadManagerIsEnabled),
+        CHECK_IF_STORAGE_IS_MOUNTED(InstallActivity::checkIfStorageIsMounted),
+        CHECK_FOR_ENOUGH_STORAGE(InstallActivity::checkForEnoughStorage),
         PRECONDITIONS_ARE_CHECKED(InstallActivity::preconditionsAreChecked),
         START_DOWNLOAD(InstallActivity::startDownload),
         REUSE_CURRENT_DOWNLOAD(InstallActivity::reuseCurrentDownload),
@@ -208,7 +206,6 @@ class InstallActivity : AppCompatActivity() {
 
         FAILURE_UNKNOWN_SIGNATURE_OF_INSTALLED_APP(InstallActivity::failureUnknownSignatureOfInstalledApp),
         FAILURE_EXTERNAL_STORAGE_NOT_ACCESSIBLE(InstallActivity::failureExternalStorageNotAccessible),
-        FAILURE_DOWNLOAD_MANAGER_DISABLED(InstallActivity::failureDownloadManagerDisabled),
         FAILURE_DOWNLOAD_UNSUCCESSFUL(InstallActivity::failureDownloadUnsuccessful),
         FAILURE_INVALID_FINGERPRINT_OF_DOWNLOADED_FILE(InstallActivity::failureInvalidFingerprintOfDownloadedFile),
         FAILURE_APP_INSTALLATION(InstallActivity::failureAppInstallation),
@@ -227,35 +224,21 @@ class InstallActivity : AppCompatActivity() {
         @MainThread
         suspend fun start(ia: InstallActivity): State {
             if (!ia.app.detail.isInstalled(ia) || ia.fingerprintValidator.checkInstalledApp(ia.app).isValid) {
-                return INSTALLED_APP_SIGNATURE_CHECKED
+                return CHECK_IF_STORAGE_IS_MOUNTED
             }
             return FAILURE_UNKNOWN_SIGNATURE_OF_INSTALLED_APP
         }
 
         @MainThread
-        fun installedAppSignatureChecked(ia: InstallActivity): State {
+        fun checkIfStorageIsMounted(ia: InstallActivity): State {
             if (Environment.getExternalStorageState() == Environment.MEDIA_MOUNTED) {
-                return EXTERNAL_STORAGE_IS_ACCESSIBLE
+                return CHECK_FOR_ENOUGH_STORAGE
             }
             return FAILURE_EXTERNAL_STORAGE_NOT_ACCESSIBLE
         }
 
         @MainThread
-        fun externalStorageIsAccessible(ia: InstallActivity): State {
-            val downloadManager = "com.android.providers.downloads"
-            return try {
-                if (ia.packageManager.getApplicationInfo(downloadManager, 0).enabled) {
-                    DOWNLOAD_MANAGER_IS_ENABLED
-                } else {
-                    FAILURE_DOWNLOAD_MANAGER_DISABLED
-                }
-            } catch (e: PackageManager.NameNotFoundException) {
-                FAILURE_DOWNLOAD_MANAGER_DISABLED
-            }
-        }
-
-        @MainThread
-        fun downloadManagerIsEnabled(ia: InstallActivity): State {
+        fun checkForEnoughStorage(ia: InstallActivity): State {
             if (StorageUtil.isEnoughStorageAvailable()) {
                 return PRECONDITIONS_ARE_CHECKED
             }
@@ -473,12 +456,6 @@ class InstallActivity : AppCompatActivity() {
                 R.id.externalStorageNotAccessible_state,
                 Environment.getExternalStorageState()
             )
-            return ERROR_STOP
-        }
-
-        @MainThread
-        fun failureDownloadManagerDisabled(ia: InstallActivity): State {
-            ia.show(R.id.downloadAppIsDisabled)
             return ERROR_STOP
         }
 
