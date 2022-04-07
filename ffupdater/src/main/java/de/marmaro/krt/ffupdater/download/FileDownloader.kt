@@ -1,5 +1,6 @@
 package de.marmaro.krt.ffupdater
 
+import android.net.TrafficStats
 import androidx.annotation.MainThread
 import androidx.annotation.WorkerThread
 import kotlinx.coroutines.Dispatchers
@@ -14,14 +15,16 @@ import java.io.File
 import java.io.IOException
 import java.net.UnknownHostException
 
-class FileDownloader(
-    @WorkerThread
-    private val onProgress: (progressInPercent: Int) -> Unit
-) {
+class FileDownloader {
+    private val trafficStatsThreadId = 10001
     var isRunning: Boolean = false
         private set
     var errorMessage: String? = null
         private set
+
+    var onProgress: (progressInPercent: Int) -> Unit = @WorkerThread {}
+    var onFailure: () -> Unit = @WorkerThread {}
+    var onSuccess: () -> Unit = @WorkerThread {}
 
     @MainThread
     suspend fun downloadFile(url: String, file: File): Boolean {
@@ -38,18 +41,21 @@ class FileDownloader(
     @WorkerThread
     private suspend fun downloadFileInternal(url: String, file: File): Boolean {
         require(url.startsWith("https://"))
+        TrafficStats.setThreadStatsTag(trafficStatsThreadId)
         val client = createClient()
         val call = callUrl(client, url) ?: return false
         call.use { response ->
             val body = response.body
             if (!response.isSuccessful || body == null) {
                 errorMessage = "HTTP code: ${response.code}"
+                onFailure()
                 return false
             }
             file.outputStream().buffered().use { fileWriter ->
                 body.byteStream().buffered().use { responseReader ->
                     // this method blocks until download is finished
                     responseReader.copyTo(fileWriter)
+                    onSuccess()
                     return true
                 }
             }
@@ -75,7 +81,7 @@ class FileDownloader(
                 val original = chain.proceed(chain.request())
                 val body = requireNotNull(original.body)
                 original.newBuilder()
-                    .body(ProgressResponseBody(body, onProgress))
+                    .body(ProgressResponseBody(body, this))
                     .build()
             }
             .build()
@@ -84,7 +90,7 @@ class FileDownloader(
 
 internal class ProgressResponseBody(
     private val responseBody: ResponseBody,
-    private val progressListener: (progressInPercent: Int) -> Any
+    private val fileDownloader: FileDownloader
 ) : ResponseBody() {
     override fun contentType() = responseBody.contentType()
     override fun contentLength() = responseBody.contentLength()
@@ -112,7 +118,7 @@ internal class ProgressResponseBody(
                 val progress = getProgress()
                 if (progress != totalProgress) {
                     totalProgress = progress
-                    progressListener.invoke(progress)
+                    fileDownloader.onProgress(progress)
                 }
                 return bytesRead
             }

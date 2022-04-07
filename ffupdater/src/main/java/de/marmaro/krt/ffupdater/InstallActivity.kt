@@ -74,7 +74,7 @@ class InstallActivity : AppCompatActivity() {
 
         val passedAppName = intent.extras?.getString(EXTRA_APP_NAME)
         if (passedAppName == null) {
-            //InstallActivity was unintentionally started again after finishing the download
+            // InstallActivity was unintentionally started again after finishing the download
             finish()
             return
         }
@@ -107,18 +107,18 @@ class InstallActivity : AppCompatActivity() {
             startActivity(Intent.createChooser(intent, "Open folder"))
         }
 
-        //make sure that the ViewModel is correct for the current app
+        // make sure that the ViewModel is correct for the current app
         viewModel = ViewModelProvider(this).get(InstallActivityViewModel::class.java)
         if (viewModel.app != null) {
             check(viewModel.app == app)
         }
         viewModel.app = app
-        //recover from an orientation change - is the download already running/finished?
-//        if (viewModel.downloadId != null) {
-//            restartStateMachine(DOWNLOAD_IS_ENQUEUED)
-//            return
-//        }
-        restartStateMachine(START)
+        // only start new download if no download is still running (can happen after rotation)
+        if (viewModel.fileDownloader?.isRunning == true) {
+            restartStateMachine(REUSE_CURRENT_DOWNLOAD)
+        } else {
+            restartStateMachine(START)
+        }
     }
 
     override fun onStop() {
@@ -194,6 +194,7 @@ class InstallActivity : AppCompatActivity() {
         DOWNLOAD_MANAGER_IS_ENABLED(InstallActivity::downloadManagerIsEnabled),
         PRECONDITIONS_ARE_CHECKED(InstallActivity::preconditionsAreChecked),
         START_DOWNLOAD(InstallActivity::startDownload),
+        REUSE_CURRENT_DOWNLOAD(InstallActivity::reuseCurrentDownload),
         DOWNLOAD_WAS_SUCCESSFUL(InstallActivity::downloadWasSuccessful),
         USE_CACHED_DOWNLOADED_APK(InstallActivity::useCachedDownloadedApk),
         FINGERPRINT_OF_DOWNLOADED_FILE_OK(InstallActivity::fingerprintOfDownloadedFileOk),
@@ -309,25 +310,22 @@ class InstallActivity : AppCompatActivity() {
             ia.show(R.id.downloadingFile)
             ia.setText(R.id.downloadingFileUrl, updateCheckResult.downloadUrl)
             ia.appCache.delete(ia)
-            val fileDownloader = FileDownloader(
-                onProgress = { percentage ->
-                    ia.runOnUiThread {
-                        ia.findViewById<ProgressBar>(R.id.downloadingFileProgressBar).progress = percentage
-                        ia.setText(
-                            R.id.downloadingFileText,
-                            ia.getString(
-                                R.string.install_activity__download_app_with_status,
-                                "${percentage.toString().padStart(3, '0')} %"
-                            )
-                        )
-                    }
-                },
-            )
+            val setDownloadingFileText = { text: String ->
+                ia.setText(
+                    R.id.downloadingFileText,
+                    ia.getString(R.string.install_activity__download_app_with_status, text)
+                )
+                println("normal $text")
+            }
+            val fileDownloader = FileDownloader()
+            fileDownloader.onProgress = { percentage ->
+                ia.runOnUiThread {
+                    ia.findViewById<ProgressBar>(R.id.downloadingFileProgressBar).progress = percentage
+                    setDownloadingFileText("$percentage %")
+                }
+            }
             ia.viewModel.fileDownloader = fileDownloader
-            ia.setText(
-                R.id.downloadingFileText,
-                ia.getString(R.string.install_activity__download_app_with_status, "   %")
-            )
+            setDownloadingFileText(" %")
 
             val url = updateCheckResult.availableResult.downloadUrl
             val file = ia.appCache.getFile(ia)
@@ -337,6 +335,30 @@ class InstallActivity : AppCompatActivity() {
                 return DOWNLOAD_WAS_SUCCESSFUL
             }
             return FAILURE_DOWNLOAD_UNSUCCESSFUL
+        }
+
+        @MainThread
+        fun reuseCurrentDownload(ia: InstallActivity): State {
+            val updateCheckResult = requireNotNull(ia.viewModel.updateCheckResult)
+            ia.show(R.id.downloadingFile)
+            ia.setText(R.id.downloadingFileUrl, updateCheckResult.downloadUrl)
+            val setDownloadingFileText = { text: String ->
+                ia.setText(
+                    R.id.downloadingFileText,
+                    ia.getString(R.string.install_activity__download_app_with_status, text)
+                )
+                println("reuse: $text")
+            }
+            val fileDownloader = requireNotNull(ia.viewModel.fileDownloader)
+            fileDownloader.onProgress = { percentage ->
+                ia.runOnUiThread {
+                    ia.findViewById<ProgressBar>(R.id.downloadingFileProgressBar).progress = percentage
+                    setDownloadingFileText("$percentage %")
+                }
+            }
+            fileDownloader.onSuccess = { ia.restartStateMachine(DOWNLOAD_WAS_SUCCESSFUL) }
+            fileDownloader.onFailure = { ia.restartStateMachine(FAILURE_DOWNLOAD_UNSUCCESSFUL) }
+            return SUCCESS_PAUSE
         }
 
         @MainThread
