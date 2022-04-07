@@ -53,7 +53,7 @@
     <string name="install_activity__delete_cache_button_text">очистить кэш</string>
     <string name="install_activity__delete_cache_explanation">Если вы считаете, что FFUpdater сохранил в кэше обновление ошибочного приложения, нажмите кнопку \"очистить кэш\", чтобы удалить кэш для этого приложения.</string>
     <string name="install_activity__download_app_is_disabled">Необходимое системное приложение \"Менеджер загрузок\" отключено. Пожалуйста, включите его снова.</string>
-    <string name="install_activity__download_application_from_with_status">Загрузить приложение (%1$s)</string>
+    <string name="install_activity__download_app_with_status">Загрузить приложение (%1$s)</string>
     <string name="install_activity__download_failed">Не удалось загрузить</string>
     <string name="install_activity__download_status_failed">неудачно</string>
     <string name="install_activity__download_status_paused">приостановлено</string>

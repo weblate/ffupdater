@@ -53,7 +53,7 @@
     <string name="install_activity__delete_cache_button_text">Cache leeren</string>
     <string name="install_activity__delete_cache_explanation">"Wenn Sie glauben, dass FFUpdater ein fehlerhaftes App-Update zwischengespeichert hat, klicken Sie auf den Button \"Cache löschen\", um den Cache für diese App zu löschen."</string>
     <string name="install_activity__download_app_is_disabled">Die notwendige System-App \"Download Manager\" ist deaktiviert. Bitte aktivieren Sie sie wieder.</string>
-    <string name="install_activity__download_application_from_with_status">Lade Anwendung herunter (%1$s)</string>
+    <string name="install_activity__download_app_with_status">Lade Anwendung herunter (%1$s)</string>
     <string name="install_activity__download_failed">Download schlug fehl</string>
     <string name="install_activity__download_status_failed">fehlgeschlagen</string>
     <string name="install_activity__download_status_paused">pausiert</string>

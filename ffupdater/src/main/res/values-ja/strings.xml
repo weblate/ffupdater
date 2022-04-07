@@ -53,7 +53,7 @@
     <string name="install_activity__delete_cache_button_text">キャッシュクリア</string>
     <string name="install_activity__delete_cache_explanation">FFUpdaterが欠陥のあるアプリのアップデートをキャッシュしたと思われる場合は、「clear cache」ボタンをクリックして、このアプリのキャッシュを削除してください。</string>
     <string name="install_activity__download_app_is_disabled">必要なシステムアプリ「Download Manager」が無効になっています。お手数ですが、再度有効にしてください。</string>
-    <string name="install_activity__download_application_from_with_status">アプリをダウンロード (%1$s)</string>
+    <string name="install_activity__download_app_with_status">アプリをダウンロード (%1$s)</string>
     <string name="install_activity__download_failed">ダウンロード失敗</string>
     <string name="install_activity__download_status_failed">失敗</string>
     <string name="install_activity__download_status_paused">休止</string>

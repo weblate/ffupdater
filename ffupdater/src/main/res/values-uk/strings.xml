@@ -53,7 +53,7 @@
     <string name="install_activity__delete_cache_button_text">очистити кеш</string>
     <string name="install_activity__delete_cache_explanation">"Якщо ви вважаєте, що FFUpdater кешував несправне оновлення програми, натисніть кнопку «очистити кеш», щоб видалити кеш цієї програми."</string>
     <string name="install_activity__download_app_is_disabled">Необхідний системний додаток \"Диспетчер завантажень\" вимкнено. Увімкніть його знову.</string>
-    <string name="install_activity__download_application_from_with_status">Завантажити програму (%1$s)</string>
+    <string name="install_activity__download_app_with_status">Завантажити програму (%1$s)</string>
     <string name="install_activity__download_failed">Не вдалося завантажити</string>
     <string name="install_activity__download_status_failed">не вдалося</string>
     <string name="install_activity__download_status_paused">призупинено</string>

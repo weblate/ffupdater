@@ -111,7 +111,7 @@
             <TextView
                 android:id="@+id/downloadingFileText"
                 style="@style/BoldTextView"
-                android:text="@string/install_activity__download_application_from_with_status" />
+                android:text="@string/install_activity__download_app_with_status" />
 
             <TextView
                 android:id="@+id/downloadingFileUrl"

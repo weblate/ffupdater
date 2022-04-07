@@ -55,7 +55,7 @@
     <string name="install_activity__delete_cache_button_text">clear cache</string>
     <string name="install_activity__delete_cache_explanation">If you think that FFUpdater has cached a faulty app update, click the \"clear cache\" button to delete the cache for this app.</string>
     <string name="install_activity__download_app_is_disabled">The necessary system app \"Download Manager\" is disabled. Please enable it again.</string>
-    <string name="install_activity__download_application_from_with_status">Download application (%1$s)</string>
+    <string name="install_activity__download_app_with_status">Download application (%1$s)</string>
     <string name="install_activity__download_failed">Download failed</string>
     <string name="install_activity__download_status_failed">failed</string>
     <string name="install_activity__download_status_paused">paused</string>

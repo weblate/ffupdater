@@ -53,7 +53,7 @@
     <string name="install_activity__delete_cache_button_text">vider le cache</string>
     <string name="install_activity__delete_cache_explanation">Si vous pensez que FFUpdater a mis en cache une mise à jour d\'application défectueuse, cliquez sur le bouton \"Effacer le cache\" pour supprimer le cache de cette application.</string>
     <string name="install_activity__download_app_is_disabled">L\'application système nécessaire \"Download Manager\" est désactivée. Veuillez la réactiver.</string>
-    <string name="install_activity__download_application_from_with_status">Télécharger l\'application (%1$s)</string>
+    <string name="install_activity__download_app_with_status">Télécharger l\'application (%1$s)</string>
     <string name="install_activity__download_failed">Echec du téléchargement</string>
     <string name="install_activity__download_status_failed">échoué</string>
     <string name="install_activity__download_status_paused">en pause</string>

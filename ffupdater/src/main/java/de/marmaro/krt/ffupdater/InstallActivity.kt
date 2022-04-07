@@ -1,7 +1,6 @@
 package de.marmaro.krt.ffupdater
 
-import android.app.DownloadManager.*
-import android.content.*
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
@@ -26,16 +25,14 @@ import de.marmaro.krt.ffupdater.app.impl.exceptions.GithubRateLimitExceededExcep
 import de.marmaro.krt.ffupdater.app.impl.exceptions.NetworkException
 import de.marmaro.krt.ffupdater.crash.CrashListener
 import de.marmaro.krt.ffupdater.download.AppCache
-import de.marmaro.krt.ffupdater.download.DownloadManagerUtil
-import de.marmaro.krt.ffupdater.download.DownloadManagerUtil.DownloadStatus.Status.*
 import de.marmaro.krt.ffupdater.download.StorageUtil
 import de.marmaro.krt.ffupdater.installer.AppInstaller
 import de.marmaro.krt.ffupdater.security.FingerprintValidator
 import de.marmaro.krt.ffupdater.security.FingerprintValidator.CertificateValidationResult
 import de.marmaro.krt.ffupdater.settings.SettingsHelper
-import kotlinx.coroutines.*
-import java.util.*
-import java.util.concurrent.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
 
 
 /**
@@ -62,7 +59,7 @@ class InstallActivity : AppCompatActivity() {
     // persistent data across orientation changes
     class InstallActivityViewModel : ViewModel() {
         var app: App? = null
-        var downloadId: Long? = null
+        var fileDownloader: FileDownloader? = null
         var updateCheckResult: UpdateCheckResult? = null
         var fetchUrlException: Exception? = null
         var fetchUrlExceptionText: String? = null
@@ -117,10 +114,10 @@ class InstallActivity : AppCompatActivity() {
         }
         viewModel.app = app
         //recover from an orientation change - is the download already running/finished?
-        if (viewModel.downloadId != null) {
-            restartStateMachine(DOWNLOAD_IS_ENQUEUED)
-            return
-        }
+//        if (viewModel.downloadId != null) {
+//            restartStateMachine(DOWNLOAD_IS_ENQUEUED)
+//            return
+//        }
         restartStateMachine(START)
     }
 
@@ -196,8 +193,7 @@ class InstallActivity : AppCompatActivity() {
         EXTERNAL_STORAGE_IS_ACCESSIBLE(InstallActivity::externalStorageIsAccessible),
         DOWNLOAD_MANAGER_IS_ENABLED(InstallActivity::downloadManagerIsEnabled),
         PRECONDITIONS_ARE_CHECKED(InstallActivity::preconditionsAreChecked),
-        ENQUEUING_DOWNLOAD(InstallActivity::enqueuingDownload),
-        DOWNLOAD_IS_ENQUEUED(InstallActivity::downloadIsEnqueued),
+        START_DOWNLOAD(InstallActivity::startDownload),
         DOWNLOAD_WAS_SUCCESSFUL(InstallActivity::downloadWasSuccessful),
         USE_CACHED_DOWNLOADED_APK(InstallActivity::useCachedDownloadedApk),
         FINGERPRINT_OF_DOWNLOADED_FILE_OK(InstallActivity::fingerprintOfDownloadedFileOk),
@@ -304,46 +300,42 @@ class InstallActivity : AppCompatActivity() {
             if (ia.appCache.isAvailable(ia, updateCheckResult.availableResult)) {
                 return USE_CACHED_DOWNLOADED_APK
             }
-            return ENQUEUING_DOWNLOAD
+            return START_DOWNLOAD
         }
 
         @MainThread
-        fun enqueuingDownload(ia: InstallActivity): State {
+        suspend fun startDownload(ia: InstallActivity): State {
             val updateCheckResult = requireNotNull(ia.viewModel.updateCheckResult)
             ia.show(R.id.downloadingFile)
             ia.setText(R.id.downloadingFileUrl, updateCheckResult.downloadUrl)
             ia.appCache.delete(ia)
-            ia.viewModel.downloadId = DownloadManagerUtil.enqueue(
-                context = ia,
-                app = ia.app,
-                availableVersionResult = updateCheckResult.availableResult,
-                fileName = ia.appCache.getFileName()
+            val fileDownloader = FileDownloader(
+                onProgress = { percentage ->
+                    ia.runOnUiThread {
+                        ia.findViewById<ProgressBar>(R.id.downloadingFileProgressBar).progress = percentage
+                        ia.setText(
+                            R.id.downloadingFileText,
+                            ia.getString(
+                                R.string.install_activity__download_app_with_status,
+                                "${percentage.toString().padStart(3, '0')} %"
+                            )
+                        )
+                    }
+                },
             )
-            return DOWNLOAD_IS_ENQUEUED
-        }
+            ia.viewModel.fileDownloader = fileDownloader
+            ia.setText(
+                R.id.downloadingFileText,
+                ia.getString(R.string.install_activity__download_app_with_status, "   %")
+            )
 
-        @MainThread
-        suspend fun downloadIsEnqueued(ia: InstallActivity): State {
-            val downloadId = requireNotNull(ia.viewModel.downloadId)
-            do {
-                val downloadStatus = DownloadManagerUtil.getStatusAndProgress(ia, downloadId)
-                val downloadStatusText = DownloadManagerUtil.getStatusText(ia, downloadStatus)
+            val url = updateCheckResult.availableResult.downloadUrl
+            val file = ia.appCache.getFile(ia)
+            val result = fileDownloader.downloadFile(url, file)
 
-                ia.setText(
-                    R.id.downloadingFileText,
-                    ia.getString(
-                        R.string.install_activity__download_application_from_with_status,
-                        downloadStatusText
-                    )
-                )
-                ia.findViewById<ProgressBar>(R.id.downloadingFileProgressBar).progress =
-                    downloadStatus.progressInPercentage
-
-                if (downloadStatus.status == SUCCESSFUL) {
-                    return DOWNLOAD_WAS_SUCCESSFUL
-                }
-                delay(500L)
-            } while (downloadStatus.status != FAILED)
+            if (result) {
+                return DOWNLOAD_WAS_SUCCESSFUL
+            }
             return FAILURE_DOWNLOAD_UNSUCCESSFUL
         }
 
@@ -429,7 +421,7 @@ class InstallActivity : AppCompatActivity() {
             ia.setText(R.id.fingerprintInstalledGoodHash, ia.appFingerprint.hexString)
             val available = updateCheckResult.availableResult
             ia.app.detail.appInstallationCallback(ia, available)
-            deleteDownloadedCacheFile(ia)
+            ia.appCache.delete(ia)
             return SUCCESS_STOP
         }
 
@@ -464,7 +456,8 @@ class InstallActivity : AppCompatActivity() {
             ia.show(R.id.downloadFileFailed)
             ia.setText(R.id.downloadFileFailedUrl, updateCheckResult.downloadUrl)
             ia.show(R.id.installerFailed)
-            deleteDownloadedCacheFile(ia)
+            print(ia.viewModel.fileDownloader?.errorMessage)
+            ia.appCache.delete(ia)
             return ERROR_STOP
         }
 
@@ -475,7 +468,7 @@ class InstallActivity : AppCompatActivity() {
             ia.setText(R.id.fingerprintDownloadBadHashActual, ia.fileFingerprint.hexString)
             ia.setText(R.id.fingerprintDownloadBadHashExpected, ia.app.detail.signatureHash)
             ia.show(R.id.installerFailed)
-            deleteDownloadedCacheFile(ia)
+            ia.appCache.delete(ia)
             return ERROR_STOP
         }
 
@@ -503,7 +496,7 @@ class InstallActivity : AppCompatActivity() {
             ia.show(R.id.fingerprintInstalledBad)
             ia.setText(R.id.fingerprintInstalledBadHashActual, ia.appFingerprint.hexString)
             ia.setText(R.id.fingerprintInstalledBadHashExpected, ia.app.detail.signatureHash)
-            deleteDownloadedCacheFile(ia)
+            ia.appCache.delete(ia)
             return ERROR_STOP
         }
 
@@ -524,13 +517,6 @@ class InstallActivity : AppCompatActivity() {
                     }
             }
             return ERROR_STOP
-        }
-
-        //===============================================
-
-        private fun deleteDownloadedCacheFile(ia: InstallActivity) {
-            ia.viewModel.downloadId?.let { id -> DownloadManagerUtil.remove(ia, id) }
-            ia.appCache.delete(ia)
         }
     }
 }
