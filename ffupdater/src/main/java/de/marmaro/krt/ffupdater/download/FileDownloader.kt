@@ -47,6 +47,7 @@ class FileDownloader {
         val client = createClient()
         val call = callUrl(client, url) ?: return false
         call.use { response ->
+            TrafficStats.setThreadStatsTag(trafficStatsThreadId)
             val body = response.body
             if (!response.isSuccessful || body == null) {
                 errorMessage = "HTTP code: ${response.code}"

@@ -59,7 +59,7 @@ class BackgroundJob(context: Context, workerParams: WorkerParameters) :
 
     private fun showErrorNotification(context: Context, e: Exception) {
         val message = context.getString(R.string.background_job_failure__notification_text)
-        ErrorNotificationBuilder.showNotification(context, e, message)
+        NotificationBuilder.showErrorNotification(context, e, message)
     }
 
     @MainThread
@@ -132,7 +132,7 @@ class BackgroundJob(context: Context, workerParams: WorkerParameters) :
     }
 
     private fun showUpdateNotification(appsWithUpdates: List<App>) {
-        UpdateNotificationBuilder.showNotifications(appsWithUpdates, applicationContext)
+        NotificationBuilder.showUpdateNotifications(applicationContext, appsWithUpdates)
     }
 
     companion object {

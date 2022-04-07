@@ -1,5 +1,6 @@
 package de.marmaro.krt.ffupdater
 
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
@@ -549,6 +550,13 @@ class InstallActivity : AppCompatActivity() {
                     }
             }
             return ERROR_STOP
+        }
+
+        fun createIntent(context: Context, app: App): Intent {
+            val intent = Intent(context, InstallActivity::class.java)
+            // intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+            intent.putExtra(EXTRA_APP_NAME, app.name)
+            return intent
         }
     }
 }
