@@ -26,6 +26,8 @@ import de.marmaro.krt.ffupdater.app.impl.exceptions.GithubRateLimitExceededExcep
 import de.marmaro.krt.ffupdater.app.impl.exceptions.NetworkException
 import de.marmaro.krt.ffupdater.crash.CrashListener
 import de.marmaro.krt.ffupdater.download.AppCache
+import de.marmaro.krt.ffupdater.download.AppDownloadStatus
+import de.marmaro.krt.ffupdater.download.FileDownloader
 import de.marmaro.krt.ffupdater.download.StorageUtil
 import de.marmaro.krt.ffupdater.installer.AppInstaller
 import de.marmaro.krt.ffupdater.security.FingerprintValidator
@@ -331,11 +333,12 @@ class InstallActivity : AppCompatActivity() {
             val url = updateCheckResult.availableResult.downloadUrl
             val file = ia.appCache.getFile(ia)
 
+            AppDownloadStatus.foregroundDownloadIsStarted()
             // download coroutine should survive a screen rotation and should live as long as the view model
             val result = withContext(ia.viewModel.viewModelScope.coroutineContext) {
                 fileDownloader.downloadFile(url, file)
             }
-
+            AppDownloadStatus.foregroundDownloadIsFinished()
             if (result) {
                 return DOWNLOAD_WAS_SUCCESSFUL
             }
@@ -362,6 +365,7 @@ class InstallActivity : AppCompatActivity() {
             }
 
             val success = fileDownloader.currentDownloadResult?.await() ?: false
+            AppDownloadStatus.foregroundDownloadIsFinished()
             if (success) {
                 return DOWNLOAD_WAS_SUCCESSFUL
             }
@@ -378,15 +382,14 @@ class InstallActivity : AppCompatActivity() {
             ia.setText(R.id.downloadedFileUrl, updateCheckResult.downloadUrl)
             ia.show(R.id.verifyDownloadFingerprint)
 
-            ia.appCache.fixFileName(ia)
             val fingerprint = ia.fingerprintValidator.checkApkFile(ia.appCache.getFile(ia), app)
             ia.fileFingerprint = fingerprint
-            return if (fingerprint.isValid) {
-                FINGERPRINT_OF_DOWNLOADED_FILE_OK
-            } else {
-                ia.appCache.delete(ia)
-                FAILURE_INVALID_FINGERPRINT_OF_DOWNLOADED_FILE
+
+            if (fingerprint.isValid) {
+                return FINGERPRINT_OF_DOWNLOADED_FILE_OK
             }
+            ia.appCache.delete(ia)
+            return FAILURE_INVALID_FINGERPRINT_OF_DOWNLOADED_FILE
         }
 
         @MainThread

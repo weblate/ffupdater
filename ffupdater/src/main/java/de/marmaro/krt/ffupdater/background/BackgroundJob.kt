@@ -9,16 +9,10 @@ import de.marmaro.krt.ffupdater.R
 import de.marmaro.krt.ffupdater.app.App
 import de.marmaro.krt.ffupdater.app.impl.exceptions.GithubRateLimitExceededException
 import de.marmaro.krt.ffupdater.app.impl.exceptions.NetworkException
-import de.marmaro.krt.ffupdater.download.AppCache
-import de.marmaro.krt.ffupdater.download.DownloadManagerUtil
-import de.marmaro.krt.ffupdater.download.DownloadManagerUtil.DownloadStatus.Status.FAILED
-import de.marmaro.krt.ffupdater.download.DownloadManagerUtil.DownloadStatus.Status.SUCCESSFUL
-import de.marmaro.krt.ffupdater.download.NetworkUtil
-import de.marmaro.krt.ffupdater.download.StorageUtil
+import de.marmaro.krt.ffupdater.download.*
 import de.marmaro.krt.ffupdater.settings.PreferencesHelper
 import de.marmaro.krt.ffupdater.settings.SettingsHelper
 import kotlinx.coroutines.CancellationException
-import kotlinx.coroutines.delay
 import java.time.LocalDateTime
 import java.util.concurrent.TimeUnit.MINUTES
 
@@ -71,7 +65,7 @@ class BackgroundJob(context: Context, workerParams: WorkerParameters) :
     @MainThread
     private suspend fun executeBackgroundJob(): Result {
         Log.i(LOG_TAG, "Execute background job for update check.")
-        if (DownloadManagerUtil.isDownloadingFilesNow(applicationContext)) {
+        if (AppDownloadStatus.areDownloadsInForegroundActive()) {
             Log.i(LOG_TAG, "Retry background job because other downloads are running.")
             return Result.retry()
         }
@@ -121,26 +115,16 @@ class BackgroundJob(context: Context, workerParams: WorkerParameters) :
             Log.i(LOG_TAG, "Skip $app download because it's already cached.")
             return
         }
-
         Log.i(LOG_TAG, "Download $app in the background.")
-        val downloadId = DownloadManagerUtil.enqueue(
-            applicationContext,
-            app,
-            availableResult,
-            appCache.getFileName()
-        )
-        repeat(60 * 60) {
-            val status = DownloadManagerUtil.getStatusAndProgress(applicationContext, downloadId).status
-            if (status == SUCCESSFUL) {
-                return
-            }
-            if (status == FAILED) {
-                return@repeat
-            }
-            delay(1000)
+
+        val url = availableResult.downloadUrl
+        val file = appCache.getFile(applicationContext)
+        AppDownloadStatus.backgroundDownloadIsStarted()
+        val result = FileDownloader().downloadFile(url, file)
+        AppDownloadStatus.backgroundDownloadIsFinished()
+        if (!result) {
+            appCache.delete(applicationContext)
         }
-        DownloadManagerUtil.remove(applicationContext, downloadId)
-        appCache.delete(applicationContext)
     }
 
     private fun updateLastBackgroundCheckTimestamp() {

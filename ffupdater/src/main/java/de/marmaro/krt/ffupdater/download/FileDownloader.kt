@@ -1,4 +1,4 @@
-package de.marmaro.krt.ffupdater
+package de.marmaro.krt.ffupdater.download
 
 import android.net.TrafficStats
 import androidx.annotation.MainThread
@@ -22,13 +22,10 @@ class FileDownloader {
     private val trafficStatsThreadId = 10001
     var errorMessage: String? = null
         private set
-
     var onProgress: (progressInPercent: Int) -> Unit = @WorkerThread {}
 
-    // fallback to register for news when
+    // fallback to register for news for existing download
     var currentDownloadResult: Deferred<Boolean>? = null
-    var onSuccess: () -> Unit = @WorkerThread {}
-    var onFailure: () -> Unit = @WorkerThread {}
 
     @MainThread
     suspend fun downloadFile(url: String, file: File): Boolean {
@@ -53,14 +50,12 @@ class FileDownloader {
             val body = response.body
             if (!response.isSuccessful || body == null) {
                 errorMessage = "HTTP code: ${response.code}"
-                onFailure()
                 return false
             }
             file.outputStream().buffered().use { fileWriter ->
                 body.byteStream().buffered().use { responseReader ->
                     // this method blocks until download is finished
                     responseReader.copyTo(fileWriter)
-                    onSuccess()
                     return true
                 }
             }
@@ -127,6 +122,37 @@ internal class ProgressResponseBody(
                 }
                 return bytesRead
             }
+        }
+    }
+}
+
+// simple communication between WorkManager and the InstallActivity to prevent duplicated downloads
+// persistence/consistence is not important -> global available variables are ok
+class AppDownloadStatus {
+    companion object {
+        private var BACKGROUND_DOWNLOAD_STARTED: Long? = null
+        private var FOREGROUND_DOWNLOAD_STARTED: Long? = null
+
+        fun areDownloadsInBackgroundActive() =
+            (System.currentTimeMillis() - (BACKGROUND_DOWNLOAD_STARTED ?: 0)) < 600_000L
+
+        fun areDownloadsInForegroundActive() =
+            (System.currentTimeMillis() - (FOREGROUND_DOWNLOAD_STARTED ?: 0)) < 600_000L
+
+        fun backgroundDownloadIsStarted() {
+            BACKGROUND_DOWNLOAD_STARTED = System.currentTimeMillis()
+        }
+
+        fun backgroundDownloadIsFinished() {
+            BACKGROUND_DOWNLOAD_STARTED = null
+        }
+
+        fun foregroundDownloadIsStarted() {
+            FOREGROUND_DOWNLOAD_STARTED = System.currentTimeMillis()
+        }
+
+        fun foregroundDownloadIsFinished() {
+            FOREGROUND_DOWNLOAD_STARTED = null
         }
     }
 }
