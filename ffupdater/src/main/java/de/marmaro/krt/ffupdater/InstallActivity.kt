@@ -121,7 +121,7 @@ class InstallActivity : AppCompatActivity() {
 
     override fun onStop() {
         super.onStop()
-        //finish activity when it's finished and the user switch to another app
+        // finish activity when it's finished and the user switch to another app
         if (state == SUCCESS_STOP || state == ERROR_STOP) {
             finish()
         }
@@ -484,8 +484,8 @@ class InstallActivity : AppCompatActivity() {
             ia.hide(R.id.downloadingFile)
             ia.show(R.id.downloadFileFailed)
             ia.setText(R.id.downloadFileFailedUrl, updateCheckResult.downloadUrl)
+            ia.setText(R.id.downloadFileFailedText, ia.viewModel.fileDownloader?.errorMessage ?: "")
             ia.show(R.id.installerFailed)
-            print(ia.viewModel.fileDownloader?.errorMessage)
             ia.appCache.delete(ia)
             return ERROR_STOP
         }
