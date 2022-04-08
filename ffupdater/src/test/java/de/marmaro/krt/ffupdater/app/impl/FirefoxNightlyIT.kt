@@ -19,10 +19,14 @@ import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.Arguments
+import org.junit.jupiter.params.provider.MethodSource
 import java.io.BufferedReader
 import java.io.FileReader
 import java.time.ZonedDateTime
-import java.time.format.DateTimeFormatter.ISO_ZONED_DATE_TIME
+import java.time.format.DateTimeFormatter
+import java.util.stream.Stream
 
 @ExtendWith(MockKExtension::class)
 class FirefoxNightlyIT {
@@ -56,6 +60,37 @@ class FirefoxNightlyIT {
     companion object {
         const val BASE_URL = "https://firefox-ci-tc.services.mozilla.com/api/index/v1/task/" +
                 "mobile.v2.fenix.nightly.latest"
+        const val EXPECTED_VERSION = "2021-05-06 17:02"
+        val EXPECTED_RELEASE_TIMESTAMP: ZonedDateTime =
+            ZonedDateTime.parse("2021-05-06T17:02:55.865Z", DateTimeFormatter.ISO_ZONED_DATE_TIME)
+
+        @JvmStatic
+        fun abisWithMetaData(): Stream<Arguments> = Stream.of(
+            Arguments.of(
+                ABI.ARMEABI_V7A,
+                "$BASE_URL.armeabi-v7a/artifacts/public/build/armeabi-v7a/target.apk",
+                "$BASE_URL.armeabi-v7a/artifacts/public/chain-of-trust.json",
+                "16342c966a2dff3561215f7bc91ea8ae0fb1902d6c533807667b224c3b87a972",
+            ),
+            Arguments.of(
+                ABI.ARM64_V8A,
+                "$BASE_URL.arm64-v8a/artifacts/public/build/arm64-v8a/target.apk",
+                "$BASE_URL.arm64-v8a/artifacts/public/chain-of-trust.json",
+                "ae53fdf802bdcd2ea95a853a60f9ba9f621fb10d30dcc98dccfd80df4eba20fc",
+            ),
+            Arguments.of(
+                ABI.X86,
+                "$BASE_URL.x86/artifacts/public/build/x86/target.apk",
+                "$BASE_URL.x86/artifacts/public/chain-of-trust.json",
+                "3c81530f5a89596c03421a08f5dab8dd6db0a3fcc7063e59b5fd42874f0a7499"
+            ),
+            Arguments.of(
+                ABI.X86_64,
+                "$BASE_URL.x86_64/artifacts/public/build/x86_64/target.apk",
+                "$BASE_URL.x86_64/artifacts/public/chain-of-trust.json",
+                "4690f2580199423822ca8323b0235cdbaac480f04bc6f21aa7f17636cd42662c"
+            ),
+        )
     }
 
     private fun createSut(deviceAbi: ABI): FirefoxNightly {
@@ -73,20 +108,60 @@ class FirefoxNightlyIT {
         )
     }
 
-    @Test
-    fun updateCheck_armeabiv7a_checkMetadata() {
-        checkMetadata(
-            ABI.ARMEABI_V7A,
-            "armeabi-v7a",
-            "16342c966a2dff3561215f7bc91ea8ae0fb1902d6c533807667b224c3b87a972"
-        )
+    @ParameterizedTest(name = "check download info for ABI \"{0}\"")
+    @MethodSource("abisWithMetaData")
+    fun `check download info for ABI X`(
+        abi: ABI,
+        downloadUrl: String,
+        logUrl: String,
+        hash: String,
+    ) {
+        makeChainOfTrustAvailableUnderUrl(logUrl)
+        val result = runBlocking { createSut(abi).updateCheck(context) }
+        assertEquals(downloadUrl, result.downloadUrl)
+        assertEquals(EXPECTED_VERSION, result.version)
+        assertEquals(EXPECTED_RELEASE_TIMESTAMP, result.publishDate)
+        assertEquals(hash, result.fileHash?.hexValue)
     }
 
-    @Test
-    fun updateCheck_armeabiv7a_checkForUpdates_noUpdates() {
-        setInstalledVersionCode(1000)
-        setInstalledSha256Hash("16342c966a2dff3561215f7bc91ea8ae0fb1902d6c533807667b224c3b87a972")
-        assertFalse(checkForUpdates(ABI.ARMEABI_V7A, "armeabi-v7a"))
+    @ParameterizedTest(name = "update check for ABI \"{0}\" - latest version installed")
+    @MethodSource("abisWithMetaData")
+    fun `update check for ABI X - latest version installed`(
+        abi: ABI,
+        downloadUrl: String,
+        logUrl: String,
+        hash: String,
+    ) {
+        makeChainOfTrustAvailableUnderUrl(logUrl)
+        sharedPreferences.edit()
+            .putLong(FirefoxNightly.INSTALLED_VERSION_CODE, 1000)
+            .putString(FirefoxNightly.INSTALLED_SHA256_HASH, hash)
+            .apply()
+        packageInfo.versionName = EXPECTED_VERSION
+        packageInfo.versionCode = 1000
+
+        val result = runBlocking { createSut(abi).updateCheck(context) }
+        assertFalse(result.isUpdateAvailable)
+    }
+
+    @ParameterizedTest(name = "update check for ABI \"{0}\" - outdated version installed - different version code")
+    @MethodSource("abisWithMetaData")
+    fun `update check for ABI X - outdated version installed - different version code`(
+        abi: ABI,
+        downloadUrl: String,
+        logUrl: String,
+        hash: String,
+    ) {
+        makeChainOfTrustAvailableUnderUrl(logUrl)
+        sharedPreferences.edit()
+            .putLong(FirefoxNightly.INSTALLED_VERSION_CODE, 1000)
+            .putString(FirefoxNightly.INSTALLED_SHA256_HASH, hash)
+            .apply()
+        packageInfo.versionName = EXPECTED_VERSION
+        packageInfo.versionCode = 990
+
+        val result = runBlocking { createSut(abi).updateCheck(context) }
+        assertTrue(result.isUpdateAvailable)
     }
 
     @Test
@@ -110,20 +185,6 @@ class FirefoxNightlyIT {
         assertTrue(checkForUpdates(ABI.ARMEABI_V7A, "armeabi-v7a"))
     }
 
-    @Test
-    fun updateCheck_arm64v8a_checkMetadata() {
-        checkMetadata(
-            ABI.ARM64_V8A, "arm64-v8a",
-            "ae53fdf802bdcd2ea95a853a60f9ba9f621fb10d30dcc98dccfd80df4eba20fc"
-        )
-    }
-
-    @Test
-    fun updateCheck_arm64v8a_checkForUpdates_noUpdates() {
-        setInstalledVersionCode(1000)
-        setInstalledSha256Hash("ae53fdf802bdcd2ea95a853a60f9ba9f621fb10d30dcc98dccfd80df4eba20fc")
-        assertFalse(checkForUpdates(ABI.ARM64_V8A, "arm64-v8a"))
-    }
 
     @Test
     fun updateCheck_arm64v8a_checkForUpdates_oldVersionInstalled() {
@@ -144,21 +205,6 @@ class FirefoxNightlyIT {
         setInstalledVersionCode(999)
         setInstalledSha256Hash("0000000000000000000000000000000000000000000000000000000000000000")
         assertTrue(checkForUpdates(ABI.ARM64_V8A, "arm64-v8a"))
-    }
-
-    @Test
-    fun updateCheck_x86_checkMetadata() {
-        checkMetadata(
-            ABI.X86, "x86",
-            "3c81530f5a89596c03421a08f5dab8dd6db0a3fcc7063e59b5fd42874f0a7499"
-        )
-    }
-
-    @Test
-    fun updateCheck_x86_checkForUpdates_noUpdates() {
-        setInstalledVersionCode(1000)
-        setInstalledSha256Hash("3c81530f5a89596c03421a08f5dab8dd6db0a3fcc7063e59b5fd42874f0a7499")
-        assertFalse(checkForUpdates(ABI.X86, "x86"))
     }
 
     @Test
@@ -183,21 +229,6 @@ class FirefoxNightlyIT {
     }
 
     @Test
-    fun updateCheck_x8664_checkMetadata() {
-        checkMetadata(
-            ABI.X86_64, "x86_64",
-            "4690f2580199423822ca8323b0235cdbaac480f04bc6f21aa7f17636cd42662c"
-        )
-    }
-
-    @Test
-    fun updateCheck_x8664_checkForUpdates_noUpdates() {
-        setInstalledVersionCode(1000)
-        setInstalledSha256Hash("4690f2580199423822ca8323b0235cdbaac480f04bc6f21aa7f17636cd42662c")
-        assertFalse(checkForUpdates(ABI.X86_64, "x86_64"))
-    }
-
-    @Test
     fun updateCheck_x8664_checkForUpdates_oldVersionInstalled() {
         setInstalledVersionCode(999)
         setInstalledSha256Hash("4690f2580199423822ca8323b0235cdbaac480f04bc6f21aa7f17636cd42662c")
@@ -216,22 +247,6 @@ class FirefoxNightlyIT {
         setInstalledVersionCode(999)
         setInstalledSha256Hash("0000000000000000000000000000000000000000000000000000000000000000")
         assertTrue(checkForUpdates(ABI.X86_64, "x86_64"))
-    }
-
-    private fun checkMetadata(abi: ABI, abiString: String, hash: String) {
-        makeChainOfTrustAvailableUnderUrl("$BASE_URL.$abiString/artifacts/public/chain-of-trust.json")
-        val actual = runBlocking { createSut(abi).updateCheck(context) }
-
-        assertEquals("2021-05-06 17:02", actual.version)
-        assertEquals(
-            "$BASE_URL.$abiString/artifacts/public/build/$abiString/target.apk",
-            actual.downloadUrl
-        )
-        assertEquals(
-            ZonedDateTime.parse("2021-05-06T17:02:55.865Z", ISO_ZONED_DATE_TIME),
-            actual.publishDate
-        )
-        assertEquals(hash, actual.fileHash?.hexValue)
     }
 
     private fun checkForUpdates(abi: ABI, abiString: String): Boolean {
