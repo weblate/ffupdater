@@ -14,9 +14,16 @@ import io.mockk.impl.annotations.MockK
 import io.mockk.junit5.MockKExtension
 import kotlinx.coroutines.runBlocking
 import org.junit.*
+import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.extension.ExtendWith
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.Arguments
+import org.junit.jupiter.params.provider.MethodSource
 import java.io.FileReader
+import java.time.ZonedDateTime
+import java.time.format.DateTimeFormatter
+import java.util.stream.Stream
 
 @ExtendWith(MockKExtension::class)
 class UngoogledChromiumIT {
@@ -37,6 +44,12 @@ class UngoogledChromiumIT {
         every {
             packageManager.getPackageInfo(App.UNGOOGLED_CHROMIUM.detail.packageName, any())
         } returns packageInfo
+
+        val path =
+            "src/test/resources/de/marmaro/krt/ffupdater/app/impl/UngoogledChromium/releases?per_page=2.json"
+        coEvery {
+            apiConsumer.consumeNetworkResource(API_URL, Array<GithubConsumer.Release>::class)
+        } returns Gson().fromJson(FileReader(path), Array<GithubConsumer.Release>::class.java)
     }
 
     companion object {
@@ -45,89 +58,54 @@ class UngoogledChromiumIT {
         const val DOWNLOAD_URL =
             "https://github.com/ungoogled-software/ungoogled-chromium-android/releases/" +
                     "download/95.0.4638.74-1"
+
+        const val EXPECTED_VERSION = "95.0.4638.74"
+        val EXPECTED_RELEASE_TIMESTAMP: ZonedDateTime =
+            ZonedDateTime.parse("2021-11-06T02:47:00Z", DateTimeFormatter.ISO_ZONED_DATE_TIME)
+
+        @JvmStatic
+        fun abisWithMetaData(): Stream<Arguments> = Stream.of(
+            Arguments.of(ABI.ARMEABI_V7A, "$DOWNLOAD_URL/ChromeModernPublic_arm.apk", 105863712L),
+            Arguments.of(ABI.ARM64_V8A, "$DOWNLOAD_URL/ChromeModernPublic_arm64.apk", 145189398L),
+            Arguments.of(ABI.X86, "$DOWNLOAD_URL/ChromeModernPublic_x86.apk", 148679160L),
+        )
     }
 
     private fun createSut(deviceAbi: ABI): UngoogledChromium {
         return UngoogledChromium(apiConsumer = apiConsumer, deviceAbis = listOf(deviceAbi))
     }
 
-    private fun makeReleasesJsonAvailable() {
-        val path =
-            "src/test/resources/de/marmaro/krt/ffupdater/app/impl/UngoogledChromium/releases?per_page=2.json"
-        coEvery {
-            apiConsumer.consumeNetworkResource(API_URL, Array<GithubConsumer.Release>::class)
-        } returns Gson().fromJson(FileReader(path), Array<GithubConsumer.Release>::class.java)
+    @ParameterizedTest(name = "check download info for ABI \"{0}\"")
+    @MethodSource("abisWithMetaData")
+    fun `check download info for ABI X`(
+        abi: ABI,
+        url: String,
+        fileSize: Long,
+    ) {
+        val result = runBlocking { createSut(abi).updateCheck(context) }
+        assertEquals(url, result.downloadUrl)
+        assertEquals(EXPECTED_VERSION, result.version)
+        assertEquals(fileSize, result.fileSizeBytes)
+        assertEquals(EXPECTED_RELEASE_TIMESTAMP, result.publishDate)
     }
 
-    @Test
-    fun updateCheck_armeabiv7a_checkVersionAndDownloadLink() {
-        makeReleasesJsonAvailable()
-        val actual = runBlocking { createSut(ABI.ARMEABI_V7A).updateCheck(context) }
-        Assert.assertEquals("95.0.4638.74", actual.version)
-        Assert.assertEquals("$DOWNLOAD_URL/ChromeModernPublic_arm.apk", actual.downloadUrl)
+    @ParameterizedTest(name = "update check for ABI \"{0}\" - outdated version installed")
+    @MethodSource("abisWithMetaData")
+    fun `update check for ABI X - outdated version installed`(
+        abi: ABI,
+    ) {
+        packageInfo.versionName = "1.18.12"
+        val result = runBlocking { createSut(abi).updateCheck(context) }
+        assertTrue(result.isUpdateAvailable)
     }
 
-    @Test
-    fun updateCheck_arm64v8a_checkVersionAndDownloadLink() {
-        makeReleasesJsonAvailable()
-        val actual = runBlocking { createSut(ABI.ARM64_V8A).updateCheck(context) }
-        Assert.assertEquals("95.0.4638.74", actual.version)
-        Assert.assertEquals("$DOWNLOAD_URL/ChromeModernPublic_arm64.apk", actual.downloadUrl)
-    }
-
-    @Test
-    fun updateCheck_x86_checkVersionAndDownloadLink() {
-        makeReleasesJsonAvailable()
-        val actual = runBlocking { createSut(ABI.X86).updateCheck(context) }
-        Assert.assertEquals("95.0.4638.74", actual.version)
-        Assert.assertEquals("$DOWNLOAD_URL/ChromeModernPublic_x86.apk", actual.downloadUrl)
-    }
-
-    @Test
-    fun updateCheck_armeabiv7a_latestVersionIsInstalled() {
-        makeReleasesJsonAvailable()
-        packageInfo.versionName = "95.0.4638.74"
-        val actual = runBlocking { createSut(ABI.ARMEABI_V7A).updateCheck(context) }
-        Assert.assertFalse(actual.isUpdateAvailable)
-    }
-
-    @Test
-    fun updateCheck_armeabiv7a_oldVersionIsInstalled() {
-        makeReleasesJsonAvailable()
-        packageInfo.versionName = "95.0.4638.54"
-        val actual = runBlocking { createSut(ABI.ARMEABI_V7A).updateCheck(context) }
-        Assert.assertTrue(actual.isUpdateAvailable)
-    }
-
-    @Test
-    fun updateCheck_arm64v8a_latestVersionIsInstalled() {
-        makeReleasesJsonAvailable()
-        packageInfo.versionName = "95.0.4638.74"
-        val actual = runBlocking { createSut(ABI.ARM64_V8A).updateCheck(context) }
-        Assert.assertFalse(actual.isUpdateAvailable)
-    }
-
-    @Test
-    fun updateCheck_arm64v8a_oldVersionIsInstalled() {
-        makeReleasesJsonAvailable()
-        packageInfo.versionName = "95.0.4638.54"
-        val actual = runBlocking { createSut(ABI.ARM64_V8A).updateCheck(context) }
-        Assert.assertTrue(actual.isUpdateAvailable)
-    }
-
-    @Test
-    fun updateCheck_x86_latestVersionIsInstalled() {
-        makeReleasesJsonAvailable()
-        packageInfo.versionName = "95.0.4638.74"
-        val actual = runBlocking { createSut(ABI.X86).updateCheck(context) }
-        Assert.assertFalse(actual.isUpdateAvailable)
-    }
-
-    @Test
-    fun updateCheck_x86_oldVersionIsInstalled() {
-        makeReleasesJsonAvailable()
-        packageInfo.versionName = "95.0.4638.54"
-        val actual = runBlocking { createSut(ABI.X86).updateCheck(context) }
-        Assert.assertTrue(actual.isUpdateAvailable)
+    @ParameterizedTest(name = "update check for ABI \"{0}\" - latest version installed")
+    @MethodSource("abisWithMetaData")
+    fun `update check for ABI X - latest version installed`(
+        abi: ABI,
+    ) {
+        packageInfo.versionName = EXPECTED_VERSION
+        val result = runBlocking { createSut(abi).updateCheck(context) }
+        assertFalse(result.isUpdateAvailable)
     }
 }

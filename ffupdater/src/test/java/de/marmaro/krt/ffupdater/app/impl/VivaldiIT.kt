@@ -12,11 +12,14 @@ import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import io.mockk.junit5.MockKExtension
 import kotlinx.coroutines.runBlocking
-import org.junit.Assert.*
-import org.junit.Test
+import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.extension.ExtendWith
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.Arguments
+import org.junit.jupiter.params.provider.MethodSource
 import java.io.File
+import java.util.stream.Stream
 
 @ExtendWith(MockKExtension::class)
 class VivaldiIT {
@@ -37,6 +40,22 @@ class VivaldiIT {
         every {
             packageManager.getPackageInfo(App.VIVALDI.detail.packageName, any())
         } returns packageInfo
+
+        val path = "src/test/resources/de/marmaro/krt/ffupdater/app/impl/Vivaldi/download.html"
+        coEvery {
+            apiConsumer.consumeNetworkResource("https://vivaldi.com/download/", String::class)
+        } returns File(path).readText()
+    }
+
+    companion object {
+        const val EXPECTED_VERSION = "4.3.2439.61"
+
+        @JvmStatic
+        fun abisWithMetaData(): Stream<Arguments> = Stream.of(
+            Arguments.of(ABI.ARMEABI_V7A, "https://downloads.vivaldi.com/stable/Vivaldi.4.3.2439.61_armeabi-v7a.apk"),
+            Arguments.of(ABI.ARM64_V8A, "https://downloads.vivaldi.com/stable/Vivaldi.4.3.2439.61_arm64-v8a.apk"),
+            Arguments.of(ABI.X86_64, "https://downloads.vivaldi.com/stable/Vivaldi.4.3.2439.61_x86-64.apk"),
+        )
     }
 
     private fun createSut(deviceAbi: ABI): Vivaldi {
@@ -44,90 +63,37 @@ class VivaldiIT {
     }
 
     private fun makeHtmlAvailable() {
-        val path = "src/test/resources/de/marmaro/krt/ffupdater/app/impl/Vivaldi/download.html"
-        coEvery {
-            apiConsumer.consumeNetworkResource("https://vivaldi.com/download/", String::class)
-        } returns File(path).readText()
+
     }
 
-    @Test
-    fun updateCheck_armeabiv7a_checkVersionAndDownloadLink() {
-        makeHtmlAvailable()
-        val actual = runBlocking { createSut(ABI.ARMEABI_V7A).updateCheck(context) }
-        assertEquals("4.3.2439.61", actual.version)
-        assertEquals(
-            "https://downloads.vivaldi.com/stable/Vivaldi.4.3.2439.61_armeabi-v7a.apk",
-            actual.downloadUrl
-        )
+    @ParameterizedTest(name = "check download info for ABI \"{0}\"")
+    @MethodSource("abisWithMetaData")
+    fun `check download info for ABI X`(
+        abi: ABI,
+        url: String,
+    ) {
+        val result = runBlocking { createSut(abi).updateCheck(context) }
+        assertEquals(url, result.downloadUrl)
+        assertEquals(EXPECTED_VERSION, result.version)
     }
 
-    @Test
-    fun updateCheck_arm64v8a_checkVersionAndDownloadLink() {
-        makeHtmlAvailable()
-        val actual = runBlocking { createSut(ABI.ARM64_V8A).updateCheck(context) }
-        assertEquals("4.3.2439.61", actual.version)
-        assertEquals(
-            "https://downloads.vivaldi.com/stable/Vivaldi.4.3.2439.61_arm64-v8a.apk",
-            actual.downloadUrl
-        )
-    }
-
-    @Test
-    fun updateCheck_x8664_checkVersionAndDownloadLink() {
-        makeHtmlAvailable()
-        val actual = runBlocking { createSut(ABI.X86_64).updateCheck(context) }
-        assertEquals("4.3.2439.61", actual.version)
-        assertEquals(
-            "https://downloads.vivaldi.com/stable/Vivaldi.4.3.2439.61_x86-64.apk",
-            actual.downloadUrl
-        )
-    }
-
-    @Test
-    fun updateCheck_armeabiv7a_latestVersionIsInstalled() {
-        makeHtmlAvailable()
-        packageInfo.versionName = "4.3.2439.61"
-        val actual = runBlocking { createSut(ABI.ARMEABI_V7A).updateCheck(context) }
-        assertFalse(actual.isUpdateAvailable)
-    }
-
-    @Test
-    fun updateCheck_armeabiv7a_oldVersionIsInstalled() {
-        makeHtmlAvailable()
+    @ParameterizedTest(name = "update check for ABI \"{0}\" - outdated version installed")
+    @MethodSource("abisWithMetaData")
+    fun `update check for ABI X - outdated version installed`(
+        abi: ABI,
+    ) {
         packageInfo.versionName = "4.3.2439.43"
-        val actual = runBlocking { createSut(ABI.ARMEABI_V7A).updateCheck(context) }
-        assertTrue(actual.isUpdateAvailable)
+        val result = runBlocking { createSut(abi).updateCheck(context) }
+        assertTrue(result.isUpdateAvailable)
     }
 
-    @Test
-    fun updateCheck_arm64v8a_latestVersionIsInstalled() {
-        makeHtmlAvailable()
-        packageInfo.versionName = "4.3.2439.61"
-        val actual = runBlocking { createSut(ABI.ARM64_V8A).updateCheck(context) }
-        assertFalse(actual.isUpdateAvailable)
-    }
-
-    @Test
-    fun updateCheck_arm64v8a_oldVersionIsInstalled() {
-        makeHtmlAvailable()
-        packageInfo.versionName = "4.3.2439.43"
-        val actual = runBlocking { createSut(ABI.ARM64_V8A).updateCheck(context) }
-        assertTrue(actual.isUpdateAvailable)
-    }
-
-    @Test
-    fun updateCheck_x8664_latestVersionIsInstalled() {
-        makeHtmlAvailable()
-        packageInfo.versionName = "4.3.2439.61"
-        val actual = runBlocking { createSut(ABI.X86_64).updateCheck(context) }
-        assertFalse(actual.isUpdateAvailable)
-    }
-
-    @Test
-    fun updateCheck_x8664_oldVersionIsInstalled() {
-        makeHtmlAvailable()
-        packageInfo.versionName = "4.3.2439.43"
-        val actual = runBlocking { createSut(ABI.X86_64).updateCheck(context) }
-        assertTrue(actual.isUpdateAvailable)
+    @ParameterizedTest(name = "update check for ABI \"{0}\" - latest version installed")
+    @MethodSource("abisWithMetaData")
+    fun `update check for ABI X - latest version installed`(
+        abi: ABI,
+    ) {
+        packageInfo.versionName = EXPECTED_VERSION
+        val result = runBlocking { createSut(abi).updateCheck(context) }
+        assertFalse(result.isUpdateAvailable)
     }
 }

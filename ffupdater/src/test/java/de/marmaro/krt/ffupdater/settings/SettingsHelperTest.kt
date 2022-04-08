@@ -15,11 +15,11 @@ import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.`is`
 import org.hamcrest.Matchers.empty
 import org.hamcrest.collection.IsIterableContainingInAnyOrder.containsInAnyOrder
-import org.junit.AfterClass
-import org.junit.Assert.*
-import org.junit.Before
-import org.junit.BeforeClass
-import org.junit.Test
+import org.junit.jupiter.api.AfterAll
+import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.BeforeAll
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
 import java.time.Duration
 
 
@@ -29,7 +29,7 @@ class SettingsHelperTest {
     lateinit var context: Context
     private lateinit var sharedPreferences: SharedPreferences
 
-    @Before
+    @BeforeEach
     fun setUp() {
         MockKAnnotations.init(this, relaxUnitFun = true)
         sharedPreferences = SPMockBuilder().createSharedPreferences()
@@ -39,13 +39,13 @@ class SettingsHelperTest {
 
     companion object {
         @JvmStatic
-        @BeforeClass
+        @BeforeAll
         fun beforeTests() {
             mockkObject(DeviceSdkTester)
         }
 
         @JvmStatic
-        @AfterClass
+        @AfterAll
         fun afterTests() {
             unmockkObject(DeviceSdkTester)
         }

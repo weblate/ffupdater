@@ -10,10 +10,10 @@ import io.mockk.MockKAnnotations
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import kotlinx.coroutines.runBlocking
-import org.junit.Assert.assertFalse
-import org.junit.Assert.assertTrue
-import org.junit.Before
-import org.junit.Test
+import org.junit.jupiter.api.Assertions.assertFalse
+import org.junit.jupiter.api.Assertions.assertTrue
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
 import java.net.URL
 import java.time.Duration
 import java.time.ZonedDateTime
@@ -34,7 +34,7 @@ class DownloadApiChecker {
 
     private val sharedPreferences = SPMockBuilder().createSharedPreferences()
 
-    @Before
+    @BeforeEach
     fun setUp() {
         MockKAnnotations.init(this, relaxUnitFun = true)
         every { context.packageManager } returns packageManager
@@ -53,7 +53,7 @@ class DownloadApiChecker {
         verifyThatDownloadLinkAvailable(result.downloadUrl)
         val age = Duration.between(result.publishDate, ZonedDateTime.now())
         val maxDays = 2 * 7
-        assertTrue("$age must be smaller then $maxDays days", age.toDays() < maxDays)
+        assertTrue(age.toDays() < maxDays)
     }
 
     @Test
@@ -63,7 +63,7 @@ class DownloadApiChecker {
         verifyThatDownloadLinkAvailable(result.downloadUrl)
         val age = Duration.between(result.publishDate, ZonedDateTime.now())
         val maxDays = 9 * 7
-        assertTrue("$age must be smaller then $maxDays days", age.toDays() < maxDays)
+        assertTrue(age.toDays() < maxDays) { "$age must be smaller then $maxDays days" }
     }
 
     @Test
@@ -73,7 +73,7 @@ class DownloadApiChecker {
         verifyThatDownloadLinkAvailable(result.downloadUrl)
         val age = Duration.between(result.publishDate, ZonedDateTime.now())
         val maxDays = 3 * 7
-        assertTrue("$age must be smaller then $maxDays days", age.toDays() < maxDays)
+        assertTrue(age.toDays() < maxDays) { "$age must be smaller then $maxDays days" }
     }
 
     @Test
@@ -83,7 +83,7 @@ class DownloadApiChecker {
         verifyThatDownloadLinkAvailable(result.downloadUrl)
         val age = Duration.between(result.publishDate, ZonedDateTime.now())
         val maxDays = 8 * 7
-        assertTrue("$age must be smaller then $maxDays days", age.toDays() < maxDays)
+        assertTrue(age.toDays() < maxDays) { "$age must be smaller then $maxDays days" }
     }
 
     @Test
@@ -93,7 +93,7 @@ class DownloadApiChecker {
         verifyThatDownloadLinkAvailable(result.downloadUrl)
         val age = Duration.between(result.publishDate, ZonedDateTime.now())
         val maxDays = 2 * 30
-        assertTrue("$age must be smaller then $maxDays days", age.toDays() < maxDays)
+        assertTrue(age.toDays() < maxDays) { "$age must be smaller then $maxDays days" }
     }
 
     @Test
@@ -104,7 +104,7 @@ class DownloadApiChecker {
         verifyThatDownloadLinkAvailable(result.downloadUrl)
         val age = Duration.between(result.publishDate, ZonedDateTime.now())
         val maxDays = 1 * 7
-        assertTrue("$age must be smaller then $maxDays days", age.toDays() < maxDays)
+        assertTrue(age.toDays() < maxDays) { "$age must be smaller then $maxDays days" }
     }
 
     @Test
@@ -114,7 +114,7 @@ class DownloadApiChecker {
         verifyThatDownloadLinkAvailable(result.downloadUrl)
         val age = Duration.between(result.publishDate, ZonedDateTime.now())
         val maxDays = 6 * 7
-        assertTrue("$age must be smaller then $maxDays days", age.toDays() < maxDays)
+        assertTrue(age.toDays() < maxDays) { "$age must be smaller then $maxDays days" }
     }
 
     @Test
@@ -124,7 +124,7 @@ class DownloadApiChecker {
         verifyThatDownloadLinkAvailable(result.downloadUrl)
         val age = Duration.between(result.publishDate, ZonedDateTime.now())
         val maxDays = 3 * 30
-        assertTrue("$age must be smaller then $maxDays days", age.toDays() < maxDays)
+        assertTrue(age.toDays() < maxDays) { "$age must be smaller then $maxDays days" }
     }
 
     @Test
@@ -134,7 +134,7 @@ class DownloadApiChecker {
         verifyThatDownloadLinkAvailable(result.downloadUrl)
         val age = Duration.between(result.publishDate, ZonedDateTime.now())
         val maxDays = 19 * 30
-        assertTrue("$age must be smaller then $maxDays days", age.toDays() < maxDays)
+        assertTrue(age.toDays() < maxDays) { "$age must be smaller then $maxDays days" }
     }
 
     @Test
@@ -152,14 +152,14 @@ class DownloadApiChecker {
         verifyThatDownloadLinkAvailable(result.downloadUrl)
         val age = Duration.between(result.publishDate, ZonedDateTime.now())
         val maxDays = 8 * 7
-        assertTrue("$age must be smaller then $maxDays days", age.toDays() < maxDays)
+        assertTrue(age.toDays() < maxDays) { "$age must be smaller then $maxDays days" }
     }
 
     private fun verifyThatDownloadLinkAvailable(urlString: String) {
         val url = URL(urlString)
         val connection = url.openConnection() as HttpsURLConnection
         val status = connection.responseCode
-        assertTrue("$status of connection must be >= 200", status >= 200)
-        assertTrue("$status of connection must be < 300", status < 300)
+        assertTrue(status >= 200) { "$status of connection must be >= 200" }
+        assertTrue(status < 300) { "$status of connection must be < 300" }
     }
 }
