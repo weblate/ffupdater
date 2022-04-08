@@ -9,7 +9,6 @@ import de.marmaro.krt.ffupdater.app.App
 import de.marmaro.krt.ffupdater.app.impl.fetch.ApiConsumer
 import de.marmaro.krt.ffupdater.app.impl.fetch.github.GithubConsumer
 import de.marmaro.krt.ffupdater.device.ABI
-import de.marmaro.krt.ffupdater.device.DeviceEnvironment
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
 import kotlinx.coroutines.runBlocking
@@ -26,6 +25,9 @@ class LockwiseIT {
     @MockK
     lateinit var packageManager: PackageManager
 
+    @MockK
+    lateinit var apiConsumer: ApiConsumer
+
     @Before
     fun setUp() {
         MockKAnnotations.init(this, relaxUnitFun = true)
@@ -38,33 +40,23 @@ class LockwiseIT {
                 "releases"
         const val DOWNLOAD_URL = "https://github.com/mozilla-lockwise/lockwise-android/releases/" +
                 "download"
+    }
 
-        @JvmStatic
-        @BeforeClass
-        fun beforeTests() {
-            mockkObject(ApiConsumer)
-            mockkObject(DeviceEnvironment)
-        }
-
-        @JvmStatic
-        @AfterClass
-        fun afterTests() {
-            unmockkObject(ApiConsumer)
-            unmockkObject(DeviceEnvironment)
-        }
+    private fun createSut(): Lockwise {
+        return Lockwise(apiConsumer = apiConsumer)
     }
 
     private fun makeReleaseJsonObjectAvailableUnderUrl(fileName: String, url: String) {
         val path = "src/test/resources/de/marmaro/krt/ffupdater/app/impl/Lockwise/$fileName"
         coEvery {
-            ApiConsumer.consumeNetworkResource(url, GithubConsumer.Release::class)
+            apiConsumer.consumeNetworkResource(url, GithubConsumer.Release::class)
         } returns Gson().fromJson(FileReader(path), GithubConsumer.Release::class.java)
     }
 
     private fun makeReleaseJsonArrayAvailableUnderUrl(fileName: String, url: String) {
         val path = "src/test/resources/de/marmaro/krt/ffupdater/app/impl/Lockwise//$fileName"
         coEvery {
-            ApiConsumer.consumeNetworkResource(url, Array<GithubConsumer.Release>::class)
+            apiConsumer.consumeNetworkResource(url, Array<GithubConsumer.Release>::class)
         } returns Gson().fromJson(FileReader(path), Array<GithubConsumer.Release>::class.java)
     }
 
@@ -78,9 +70,8 @@ class LockwiseIT {
         } returns packageInfo
 
         for (abi in ABI.values()) {
-            every { DeviceEnvironment.abis } returns listOf(abi)
             val actual = runBlocking {
-                Lockwise().updateCheck(context).downloadUrl
+                createSut().updateCheck(context).downloadUrl
             }
             val expected = "$DOWNLOAD_URL/release-v4.0.3/lockbox-app-release-6584-signed.apk"
             assertEquals(expected, actual)
@@ -94,12 +85,11 @@ class LockwiseIT {
         every {
             packageManager.getPackageInfo(App.LOCKWISE.detail.packageName, any())
         } returns packageInfo
-        every { DeviceEnvironment.abis } returns listOf(ABI.ARMEABI_V7A)
 
         // installed app is up-to-date
         runBlocking {
             packageInfo.versionName = "4.0.3"
-            val actual = Lockwise().updateCheck(context)
+            val actual = createSut().updateCheck(context)
             assertFalse(actual.isUpdateAvailable)
             assertEquals("4.0.3", actual.version)
             assertEquals(37188004L, actual.fileSizeBytes)
@@ -112,7 +102,7 @@ class LockwiseIT {
         // installed app is old
         runBlocking {
             packageInfo.versionName = "4.0.0"
-            val actual = Lockwise().updateCheck(context)
+            val actual = createSut().updateCheck(context)
             assertTrue(actual.isUpdateAvailable)
             assertEquals("4.0.3", actual.version)
             assertEquals(37188004L, actual.fileSizeBytes)
@@ -133,9 +123,8 @@ class LockwiseIT {
         } returns packageInfo
 
         for (abi in ABI.values()) {
-            every { DeviceEnvironment.abis } returns listOf(abi)
             val actual = runBlocking {
-                Lockwise().updateCheck(context).downloadUrl
+                createSut().updateCheck(context).downloadUrl
             }
             val expected = "$DOWNLOAD_URL/release-v3.3.0-RC-2/lockbox-app-release-5784-signed.apk"
             assertEquals(expected, actual)
@@ -150,12 +139,11 @@ class LockwiseIT {
         every {
             packageManager.getPackageInfo(App.LOCKWISE.detail.packageName, any())
         } returns packageInfo
-        every { DeviceEnvironment.abis } returns listOf(ABI.ARMEABI_V7A)
 
         // installed app is up-to-date
         runBlocking {
             packageInfo.versionName = "3.3.0"
-            val actual = Lockwise().updateCheck(context)
+            val actual = createSut().updateCheck(context)
             assertFalse(actual.isUpdateAvailable)
             assertEquals("3.3.0", actual.version)
             assertEquals(19367045L, actual.fileSizeBytes)
@@ -168,7 +156,7 @@ class LockwiseIT {
         // installed app is old
         runBlocking {
             packageInfo.versionName = "3.2.0"
-            val actual = Lockwise().updateCheck(context)
+            val actual = createSut().updateCheck(context)
             assertTrue(actual.isUpdateAvailable)
             assertEquals("3.3.0", actual.version)
             assertEquals(19367045L, actual.fileSizeBytes)

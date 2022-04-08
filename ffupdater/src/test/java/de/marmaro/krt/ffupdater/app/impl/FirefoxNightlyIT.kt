@@ -10,14 +10,13 @@ import de.marmaro.krt.ffupdater.app.App
 import de.marmaro.krt.ffupdater.app.impl.fetch.ApiConsumer
 import de.marmaro.krt.ffupdater.app.impl.fetch.mozillaci.MozillaCiJsonConsumer
 import de.marmaro.krt.ffupdater.device.ABI
-import de.marmaro.krt.ffupdater.device.DeviceEnvironment
-import io.mockk.*
+import io.mockk.MockKAnnotations
+import io.mockk.coEvery
+import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import kotlinx.coroutines.runBlocking
-import org.junit.AfterClass
 import org.junit.Assert.*
 import org.junit.Before
-import org.junit.BeforeClass
 import org.junit.Test
 import java.io.BufferedReader
 import java.io.FileReader
@@ -33,6 +32,9 @@ class FirefoxNightlyIT {
 
     private var packageInfo = PackageInfo()
     private val sharedPreferences = SPMockBuilder().createSharedPreferences()
+
+    @MockK
+    lateinit var apiConsumer: ApiConsumer
 
     @Before
     fun setUp() {
@@ -53,27 +55,17 @@ class FirefoxNightlyIT {
     companion object {
         const val BASE_URL = "https://firefox-ci-tc.services.mozilla.com/api/index/v1/task/" +
                 "mobile.v2.fenix.nightly.latest"
+    }
 
-        @JvmStatic
-        @BeforeClass
-        fun beforeTests() {
-            mockkObject(ApiConsumer)
-            mockkObject(DeviceEnvironment)
-        }
-
-        @JvmStatic
-        @AfterClass
-        fun afterTests() {
-            unmockkObject(ApiConsumer)
-            unmockkObject(DeviceEnvironment)
-        }
+    private fun createSut(deviceAbi: ABI): FirefoxNightly {
+        return FirefoxNightly(apiConsumer = apiConsumer, deviceAbis = listOf(deviceAbi))
     }
 
     private fun makeChainOfTrustAvailableUnderUrl(url: String) {
         val path = "src/test/resources/de/marmaro/krt/ffupdater/app/impl/FirefoxNightly/" +
                 "chain-of-trust.json"
         coEvery {
-            ApiConsumer.consumeNetworkResource(url, MozillaCiJsonConsumer.ChainOfTrustJson::class)
+            apiConsumer.consumeNetworkResource(url, MozillaCiJsonConsumer.ChainOfTrustJson::class)
         } returns Gson().fromJson(
             BufferedReader(FileReader(path)),
             MozillaCiJsonConsumer.ChainOfTrustJson::class.java
@@ -227,8 +219,7 @@ class FirefoxNightlyIT {
 
     private fun checkMetadata(abi: ABI, abiString: String, hash: String) {
         makeChainOfTrustAvailableUnderUrl("$BASE_URL.$abiString/artifacts/public/chain-of-trust.json")
-        every { DeviceEnvironment.abis } returns listOf(abi)
-        val actual = runBlocking { FirefoxNightly().updateCheck(context) }
+        val actual = runBlocking { createSut(abi).updateCheck(context) }
 
         assertEquals("2021-05-06 17:02", actual.version)
         assertEquals(
@@ -244,10 +235,9 @@ class FirefoxNightlyIT {
 
     private fun checkForUpdates(abi: ABI, abiString: String): Boolean {
         makeChainOfTrustAvailableUnderUrl("$BASE_URL.$abiString/artifacts/public/chain-of-trust.json")
-        every { DeviceEnvironment.abis } returns listOf(abi)
         packageInfo.versionCode = 1000
 
-        val actual = runBlocking { FirefoxNightly().updateCheck(context) }
+        val actual = runBlocking { createSut(abi).updateCheck(context) }
         return actual.isUpdateAvailable
     }
 
