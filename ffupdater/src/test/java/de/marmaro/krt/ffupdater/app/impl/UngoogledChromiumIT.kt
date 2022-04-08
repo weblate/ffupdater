@@ -11,10 +11,14 @@ import de.marmaro.krt.ffupdater.app.impl.fetch.github.GithubConsumer
 import de.marmaro.krt.ffupdater.device.ABI
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
+import io.mockk.junit5.MockKExtension
 import kotlinx.coroutines.runBlocking
 import org.junit.*
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.extension.ExtendWith
 import java.io.FileReader
 
+@ExtendWith(MockKExtension::class)
 class UngoogledChromiumIT {
     @MockK
     lateinit var context: Context
@@ -26,9 +30,8 @@ class UngoogledChromiumIT {
     @MockK
     lateinit var apiConsumer: ApiConsumer
 
-    @Before
+    @BeforeEach
     fun setUp() {
-        MockKAnnotations.init(this, relaxUnitFun = true)
         every { context.packageManager } returns packageManager
         every { context.getString(R.string.available_version, any()) } returns "/"
         every {
