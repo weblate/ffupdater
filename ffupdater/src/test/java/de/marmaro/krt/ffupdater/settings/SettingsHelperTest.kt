@@ -11,10 +11,6 @@ import io.mockk.impl.annotations.MockK
 import io.mockk.junit5.MockKExtension
 import io.mockk.mockkObject
 import io.mockk.unmockkObject
-import org.hamcrest.MatcherAssert.assertThat
-import org.hamcrest.Matchers.`is`
-import org.hamcrest.Matchers.empty
-import org.hamcrest.collection.IsIterableContainingInAnyOrder.containsInAnyOrder
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeAll
@@ -131,55 +127,64 @@ class SettingsHelperTest {
     @Test
     fun getDisableApps_withOneApp_Brave_returnApps() {
         sharedPreferences.edit().putStringSet("disableApps", setOf("BRAVE")).commit()
-        assertThat(SettingsHelper(context).disabledApps, containsInAnyOrder(App.BRAVE))
+        val disabledApps = SettingsHelper(context).disabledApps
+        assertTrue(disabledApps.contains(App.BRAVE))
     }
 
     @Test
     fun getDisableApps_withOneApp_FirefoxBeta_returnApps() {
         sharedPreferences.edit().putStringSet("disableApps", setOf("FIREFOX_BETA")).commit()
-        assertThat(SettingsHelper(context).disabledApps, containsInAnyOrder(App.FIREFOX_BETA))
+        val disabledApps = SettingsHelper(context).disabledApps
+        assertTrue(disabledApps.contains(App.FIREFOX_BETA))
     }
 
     @Test
     fun getDisableApps_withOneApp_FirefoxFocus_returnApps() {
         sharedPreferences.edit().putStringSet("disableApps", setOf("FIREFOX_FOCUS")).commit()
-        assertThat(SettingsHelper(context).disabledApps, containsInAnyOrder(App.FIREFOX_FOCUS))
+        val disabledApps = SettingsHelper(context).disabledApps
+        assertTrue(disabledApps.contains(App.FIREFOX_FOCUS))
     }
 
     @Test
     fun getDisableApps_withOneApp_FirefoxKlar_returnApps() {
         sharedPreferences.edit().putStringSet("disableApps", setOf("FIREFOX_KLAR")).commit()
-        assertThat(SettingsHelper(context).disabledApps, containsInAnyOrder(App.FIREFOX_KLAR))
+        val disabledApps = SettingsHelper(context).disabledApps
+        assertTrue(disabledApps.contains(App.FIREFOX_KLAR))
     }
 
     @Test
     fun getDisableApps_withOneApp_FirefoxNightly_returnApps() {
         sharedPreferences.edit().putStringSet("disableApps", setOf("FIREFOX_NIGHTLY")).commit()
-        assertThat(SettingsHelper(context).disabledApps, containsInAnyOrder(App.FIREFOX_NIGHTLY))
+        val disabledApps = SettingsHelper(context).disabledApps
+        assertTrue(disabledApps.contains(App.FIREFOX_NIGHTLY))
     }
 
     @Test
     fun getDisableApps_withOneApp_FirefoxRelease_returnApps() {
         sharedPreferences.edit().putStringSet("disableApps", setOf("FIREFOX_RELEASE")).commit()
-        assertThat(SettingsHelper(context).disabledApps, containsInAnyOrder(App.FIREFOX_RELEASE))
+        val disabledApps = SettingsHelper(context).disabledApps
+        assertTrue(disabledApps.contains(App.FIREFOX_RELEASE))
     }
 
     @Test
     fun getDisableApps_withOneApp_Iceraven_returnApps() {
         sharedPreferences.edit().putStringSet("disableApps", setOf("ICERAVEN")).commit()
-        assertThat(SettingsHelper(context).disabledApps, containsInAnyOrder(App.ICERAVEN))
+        val disabledApps = SettingsHelper(context).disabledApps
+        assertTrue(disabledApps.contains(App.ICERAVEN))
     }
 
     @Test
     fun getDisableApps_withOneApp_Lockwise_returnApps() {
         sharedPreferences.edit().putStringSet("disableApps", setOf("LOCKWISE")).commit()
-        assertThat(SettingsHelper(context).disabledApps, containsInAnyOrder(App.LOCKWISE))
+        val disabledApps = SettingsHelper(context).disabledApps
+        assertTrue(disabledApps.contains(App.LOCKWISE))
     }
 
     @Test
     fun getDisableApps_withInvalidApps_ignoreThem() {
         sharedPreferences.edit().putStringSet("disableApps", setOf("invalid")).commit()
-        assertThat(SettingsHelper(context).disabledApps, `is`(empty()))
+        val disabledApps = SettingsHelper(context).disabledApps
+        assertTrue(disabledApps.isEmpty())
     }
 
     @Test

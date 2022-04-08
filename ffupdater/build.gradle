@@ -35,10 +35,7 @@ dependencies {
 
     // Aggregator dependency on JUnit api, engine, and params
     testImplementation "org.junit.jupiter:junit-jupiter:5.8.2"
-    testRuntimeOnly "org.junit.vintage:junit-vintage-engine:5.8.2"
     testImplementation 'io.mockk:mockk:1.10.5'
-    testImplementation 'org.hamcrest:hamcrest:2.2'
-    testImplementation 'org.exparity:hamcrest-date:2.0.7'
     testImplementation 'com.github.IvanShafran:shared-preferences-mock:1.1'
 }
 
