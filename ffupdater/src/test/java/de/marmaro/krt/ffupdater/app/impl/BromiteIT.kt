@@ -103,7 +103,7 @@ class BromiteIT {
     fun `update check for ABI X - latest version installed`(
         abi: ABI,
     ) {
-        packageInfo.versionName = "100.0.4896.57"
+        packageInfo.versionName = EXPECTED_VERSION
         val result = runBlocking { createSut(abi).updateCheck(context) }
         assertFalse(result.isUpdateAvailable)
     }
