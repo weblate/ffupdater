@@ -6,14 +6,15 @@ import com.github.ivanshafran.sharedpreferencesmock.SPMockBuilder
 import de.marmaro.krt.ffupdater.app.impl.*
 import de.marmaro.krt.ffupdater.app.impl.fetch.ApiConsumer
 import de.marmaro.krt.ffupdater.device.ABI
-import io.mockk.MockKAnnotations
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
+import io.mockk.junit5.MockKExtension
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.ExtendWith
 import java.net.URL
 import java.time.Duration
 import java.time.ZonedDateTime
@@ -25,6 +26,7 @@ import javax.net.ssl.HttpsURLConnection
  *  - still working
  *  - not downloading outdated versions
  */
+@ExtendWith(MockKExtension::class)
 class DownloadApiChecker {
     @MockK
     private lateinit var context: Context
@@ -36,7 +38,6 @@ class DownloadApiChecker {
 
     @BeforeEach
     fun setUp() {
-        MockKAnnotations.init(this, relaxUnitFun = true)
         every { context.packageManager } returns packageManager
         every { context.getString(R.string.available_version, any()) } returns "/"
         every { context.packageName } returns "de.marmaro.krt.ffupdater"

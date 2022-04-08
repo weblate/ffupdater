@@ -6,9 +6,9 @@ import androidx.appcompat.app.AppCompatDelegate.*
 import com.github.ivanshafran.sharedpreferencesmock.SPMockBuilder
 import de.marmaro.krt.ffupdater.app.App
 import de.marmaro.krt.ffupdater.device.DeviceSdkTester
-import io.mockk.MockKAnnotations
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
+import io.mockk.junit5.MockKExtension
 import io.mockk.mockkObject
 import io.mockk.unmockkObject
 import org.hamcrest.MatcherAssert.assertThat
@@ -20,9 +20,10 @@ import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.ExtendWith
 import java.time.Duration
 
-
+@ExtendWith(MockKExtension::class)
 class SettingsHelperTest {
 
     @MockK
@@ -31,7 +32,6 @@ class SettingsHelperTest {
 
     @BeforeEach
     fun setUp() {
-        MockKAnnotations.init(this, relaxUnitFun = true)
         sharedPreferences = SPMockBuilder().createSharedPreferences()
         every { context.getSharedPreferences(any(), any()) } returns sharedPreferences
         every { context.packageName } returns "de.marmaro.krt.ffupdater"
