@@ -35,8 +35,6 @@ dependencies {
 
     // Aggregator dependency on JUnit api, engine, and params
     testImplementation "org.junit.jupiter:junit-jupiter:5.8.2"
-    // (Optional) If you also have JUnit 4-based tests
-    testImplementation "junit:junit:4.13.2"
     testRuntimeOnly "org.junit.vintage:junit-vintage-engine:5.8.2"
     testImplementation 'io.mockk:mockk:1.10.5'
     testImplementation 'org.hamcrest:hamcrest:2.2'
