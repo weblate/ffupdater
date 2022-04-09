@@ -44,6 +44,7 @@ class MainActivity : AppCompatActivity() {
     private val availableVersions: EnumMap<App, TextView> = EnumMap(App::class.java)
     private val downloadButtons: EnumMap<App, ImageButton> = EnumMap(App::class.java)
     private val errorsDuringUpdateCheck: EnumMap<App, Exception?> = EnumMap(App::class.java)
+    private lateinit var settingsHelper: SettingsHelper
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -54,7 +55,8 @@ class MainActivity : AppCompatActivity() {
         if (BuildConfig.BUILD_TYPE == "debug") {
             StrictModeSetup.enableStrictMode()
         }
-        AppCompatDelegate.setDefaultNightMode(SettingsHelper(this).themePreference)
+        settingsHelper = SettingsHelper(this)
+        AppCompatDelegate.setDefaultNightMode(settingsHelper.themePreference)
         Migrator().migrate(this)
 
         val deviceAbis = DeviceAbiExtractor.findSupportedAbis()
@@ -68,34 +70,7 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
-
-    @MainThread
-    private fun userTriggersAppDownload(app: App) {
-        if (NetworkUtil.isInternetUnavailable(this)) {
-            showInternetUnavailableToast()
-            return
-        }
-        // true: same version is already installed -> show warning
-        // false: an other version is installed (probably older) ->
-        //          install new version without warning
-        // null: due to e.g. network issues it isn't known if the same version is installed ->
-        //          install new version without warning
-        if (sameAppVersionAlreadyInstalled[app] == true) {
-            InstallSameVersionDialog.newInstance(app).show(supportFragmentManager)
-        } else {
-            installAppButCheckForCurrentDownloads(app)
-        }
-    }
-
-    @MainThread
-    fun installAppButCheckForCurrentDownloads(app: App) {
-        if (AppDownloadStatus.areDownloadsInBackgroundActive()) {
-            RunningDownloadsDialog.newInstance(app).show(supportFragmentManager)
-        } else {
-            installApp(app)
-        }
-    }
-
+    
     @MainThread
     override fun onResume() {
         super.onResume()
@@ -170,7 +145,13 @@ class MainActivity : AppCompatActivity() {
             }
 
             val downloadButton: ImageButton = newCardView.findViewWithTag("appDownloadButton")
-            downloadButton.setOnClickListener { userTriggersAppDownload(app) }
+            downloadButton.setOnClickListener {
+                if (sameAppVersionAlreadyInstalled[app] == true) {
+                    InstallSameVersionDialog.newInstance(app).show(supportFragmentManager)
+                } else {
+                    installApp(app, askForConfirmationIfOtherDownloadsAreRunning = true)
+                }
+            }
             downloadButtons[app] = downloadButton
             disableDownloadButton(app)
 
@@ -191,26 +172,28 @@ class MainActivity : AppCompatActivity() {
 
     @MainThread
     private suspend fun checkForUpdates() {
-        val installedApps = App.values().filter { app ->
-            app.detail.isInstalled(this@MainActivity)
+        val apps = App.values()
+            .filter {
+                it.detail.isInstalled(this@MainActivity)
+            }
+
+        val abortUpdateCheck = { message: Int ->
+            apps.forEach { setAvailableVersion(it, getString(message)) }
+            hideLoadAnimation()
+            showToast(message)
         }
         if (NetworkUtil.isInternetUnavailable(this)) {
-            installedApps.forEach { app ->
-                val message = getString(R.string.main_activity__no_internet_connection)
-                setAvailableVersion(app, message)
-            }
-            hideLoadAnimation()
-            showInternetUnavailableToast()
+            abortUpdateCheck(R.string.main_activity__no_internet_connection)
+            return
+        }
+        if (!settingsHelper.isForegroundUpdateCheckOnMeteredAllowed && NetworkUtil.isActiveNetworkMetered(this)) {
+            abortUpdateCheck(R.string.main_activity__no_unmetered_network)
             return
         }
 
         showLoadAnimation()
-        installedApps.forEach { app ->
-            setAvailableVersion(app, getString(R.string.available_version_loading))
-        }
-        installedApps.forEach { app ->
-            checkForAppUpdateInIOThread(app)
-        }
+        apps.forEach { setAvailableVersion(it, getString(R.string.available_version_loading)) }
+        apps.forEach { checkForAppUpdateInIOThread(it) }
         hideLoadAnimation()
     }
 
@@ -250,20 +233,28 @@ class MainActivity : AppCompatActivity() {
     }
 
     @MainThread
-    fun installApp(app: App) {
+    fun installApp(app: App, askForConfirmationIfOtherDownloadsAreRunning: Boolean = false) {
         if (NetworkUtil.isInternetUnavailable(this)) {
-            showInternetUnavailableToast()
+            showToast(R.string.main_activity__no_internet_connection)
             return
         }
+        if (!settingsHelper.isForegroundUpdateCheckOnMeteredAllowed && NetworkUtil.isActiveNetworkMetered(this)) {
+            showToast(R.string.main_activity__no_unmetered_network)
+            return
+        }
+        if (askForConfirmationIfOtherDownloadsAreRunning && AppDownloadStatus.areDownloadsInBackgroundActive()) {
+            RunningDownloadsDialog.newInstance(app).show(supportFragmentManager)
+            return
+        }
+
         val intent = Intent(this@MainActivity, InstallActivity::class.java)
         intent.putExtra(InstallActivity.EXTRA_APP_NAME, app.name)
         startActivity(intent)
     }
 
     @UiThread
-    private fun showInternetUnavailableToast() {
+    private fun showToast(message: Int) {
         val layout = findViewById<View>(R.id.coordinatorLayout)
-        val message = R.string.main_activity__no_internet_connection
         Snackbar.make(layout, message, Snackbar.LENGTH_LONG).show()
     }
 

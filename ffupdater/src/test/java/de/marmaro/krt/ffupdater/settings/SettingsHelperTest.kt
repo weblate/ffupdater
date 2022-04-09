@@ -48,6 +48,62 @@ class SettingsHelperTest {
     }
 
     @Test
+    fun `isForegroundUpdateCheckOnMeteredAllowed test default value`() {
+        assertTrue(SettingsHelper(context).isForegroundUpdateCheckOnMeteredAllowed)
+    }
+
+    @Test
+    fun `isForegroundUpdateCheckOnMeteredAllowed return true`() {
+        sharedPreferences.edit().putBoolean("foreground__update_check__metered", true).commit()
+        assertTrue(SettingsHelper(context).isForegroundUpdateCheckOnMeteredAllowed)
+    }
+
+    @Test
+    fun `isForegroundUpdateCheckOnMeteredAllowed return false`() {
+        sharedPreferences.edit().putBoolean("foreground__update_check__metered", false).commit()
+        assertFalse(SettingsHelper(context).isForegroundUpdateCheckOnMeteredAllowed)
+    }
+
+    @Test
+    fun `isForegroundUpdateCheckOnMeteredAllowed dont cache value`() {
+        val settingsHelper = SettingsHelper(context)
+
+        sharedPreferences.edit().putBoolean("foreground__update_check__metered", false).commit()
+        assertFalse(settingsHelper.isForegroundUpdateCheckOnMeteredAllowed)
+
+        sharedPreferences.edit().putBoolean("foreground__update_check__metered", true).commit()
+        assertTrue(settingsHelper.isForegroundUpdateCheckOnMeteredAllowed)
+    }
+
+    @Test
+    fun `isForegroundDownloadOnMeteredAllowed test default value`() {
+        assertTrue(SettingsHelper(context).isForegroundDownloadOnMeteredAllowed)
+    }
+
+    @Test
+    fun `isForegroundDownloadOnMeteredAllowed return true`() {
+        sharedPreferences.edit().putBoolean("foreground__download__metered", true).commit()
+        assertTrue(SettingsHelper(context).isForegroundDownloadOnMeteredAllowed)
+    }
+
+    @Test
+    fun `isForegroundDownloadOnMeteredAllowed return false`() {
+        sharedPreferences.edit().putBoolean("foreground__download__metered", false).commit()
+        assertFalse(SettingsHelper(context).isForegroundDownloadOnMeteredAllowed)
+    }
+
+    @Test
+    fun `isForegroundDownloadOnMeteredAllowed dont cache value`() {
+        val settingsHelper = SettingsHelper(context)
+
+        sharedPreferences.edit().putBoolean("foreground__download__metered", false).commit()
+        assertFalse(settingsHelper.isForegroundDownloadOnMeteredAllowed)
+
+        sharedPreferences.edit().putBoolean("foreground__download__metered", true).commit()
+        assertTrue(settingsHelper.isForegroundDownloadOnMeteredAllowed)
+    }
+
+    @Test
     fun `isBackgroundUpdateCheckEnabled test default value`() {
         assertTrue(SettingsHelper(context).isBackgroundUpdateCheckEnabled)
     }

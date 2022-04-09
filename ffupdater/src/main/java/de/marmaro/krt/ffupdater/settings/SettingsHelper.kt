@@ -14,6 +14,12 @@ import java.time.Duration
 class SettingsHelper(context: Context) {
     private val preferences = PreferenceManager.getDefaultSharedPreferences(context)
 
+    val isForegroundUpdateCheckOnMeteredAllowed: Boolean
+        get() = preferences.getBoolean("foreground__update_check__metered", true)
+
+    val isForegroundDownloadOnMeteredAllowed: Boolean
+        get() = preferences.getBoolean("foreground__download__metered", true)
+
     private val validAndroidThemes = listOf(
         MODE_NIGHT_FOLLOW_SYSTEM,
         MODE_NIGHT_AUTO_BATTERY,
