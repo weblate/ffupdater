@@ -32,7 +32,7 @@ import de.marmaro.krt.ffupdater.dialog.RunningDownloadsDialog
 import de.marmaro.krt.ffupdater.download.AppDownloadStatus
 import de.marmaro.krt.ffupdater.download.NetworkUtil
 import de.marmaro.krt.ffupdater.security.StrictModeSetup
-import de.marmaro.krt.ffupdater.settings.PreferencesHelper
+import de.marmaro.krt.ffupdater.settings.DataStoreHelper
 import de.marmaro.krt.ffupdater.settings.SettingsHelper
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -70,7 +70,7 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
-    
+
     @MainThread
     override fun onResume() {
         super.onResume()
@@ -94,15 +94,13 @@ class MainActivity : AppCompatActivity() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         val itemId = item.itemId
         if (itemId == R.id.action_about) {
-            val timestamp = PreferencesHelper(this).lastBackgroundCheck
+            val timestamp = DataStoreHelper(this).lastBackgroundCheck
                 ?.let { DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm").format(it) }
                 ?: "/"
             AlertDialog.Builder(this@MainActivity)
                 .setTitle(R.string.action_about_title)
                 .setMessage(getString(R.string.infobox, timestamp))
-                .setNeutralButton(R.string.ok) { dialog: DialogInterface, _: Int ->
-                    dialog.dismiss()
-                }
+                .setNeutralButton(R.string.ok) { dialog: DialogInterface, _: Int -> dialog.dismiss() }
                 .create()
                 .show()
         } else if (itemId == R.id.action_settings) {

@@ -10,7 +10,7 @@ import de.marmaro.krt.ffupdater.app.App
 import de.marmaro.krt.ffupdater.app.impl.exceptions.GithubRateLimitExceededException
 import de.marmaro.krt.ffupdater.app.impl.exceptions.NetworkException
 import de.marmaro.krt.ffupdater.download.*
-import de.marmaro.krt.ffupdater.settings.PreferencesHelper
+import de.marmaro.krt.ffupdater.settings.DataStoreHelper
 import de.marmaro.krt.ffupdater.settings.SettingsHelper
 import kotlinx.coroutines.CancellationException
 import java.time.LocalDateTime
@@ -127,7 +127,7 @@ class BackgroundJob(context: Context, workerParams: WorkerParameters) :
     }
 
     private fun updateLastBackgroundCheckTimestamp() {
-        PreferencesHelper(applicationContext).lastBackgroundCheck = LocalDateTime.now()
+        DataStoreHelper(applicationContext).lastBackgroundCheck = LocalDateTime.now()
     }
 
     private fun showUpdateNotification(appsWithUpdates: List<App>) {
