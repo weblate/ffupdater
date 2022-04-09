@@ -28,10 +28,22 @@ class SettingsHelper(context: Context) {
             val minutesAsString = preferences.getString("background__update_check__interval", null)
             // if undefined or invalid -> use 360 minutes (6 hours)
             val minutes = minutesAsString?.toLongOrNull() ?: 360L
-            // keep minutes in range between 15 minutes and 40320 minutes (1 week)
+            // keep minutes in range between 15 minutes and 40320 minutes (1 month)
             val minutesInRange = minutes.coerceIn(15L, 40320L)
             return Duration.ofMinutes(minutesInRange)
         }
+
+    val isBackgroundUpdateCheckOnMeteredAllowed: Boolean
+        get() = preferences.getBoolean("background__update_check__metered", true)
+
+    val isBackgroundDownloadEnabled: Boolean
+        get() = preferences.getBoolean("background__download__enabled", true)
+
+    val isBackgroundDownloadOnMeteredAllowed: Boolean
+        get() = preferences.getBoolean("background__download__metered", false)
+
+    val isBackgroundInstallationEnabled: Boolean
+        get() = preferences.getBoolean("background__installation__enabled", false)
 
     /**
      * This setting is necessary to deactivate apps when e.g. their update checks are broken.

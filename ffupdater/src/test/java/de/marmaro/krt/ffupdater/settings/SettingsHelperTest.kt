@@ -112,8 +112,112 @@ class SettingsHelperTest {
 
     @Test
     fun `backgroundUpdateCheckInterval with too high value`() {
-        sharedPreferences.edit().putString("checkInterval", "57600" /*40 days*/).commit()
-        assertEquals(Duration.ofDays(7), SettingsHelper(context).backgroundUpdateCheckInterval)
+        sharedPreferences.edit().putString("background__update_check__interval", "100000").commit()
+        assertEquals(Duration.ofDays(28), SettingsHelper(context).backgroundUpdateCheckInterval)
+    }
+
+    @Test
+    internal fun `isBackgroundUpdateCheckOnMeteredAllowed default value`() {
+        assertTrue(SettingsHelper(context).isBackgroundUpdateCheckOnMeteredAllowed)
+    }
+
+    @Test
+    internal fun `isBackgroundUpdateCheckOnMeteredAllowed with false`() {
+        sharedPreferences.edit().putBoolean("background__update_check__metered", false).commit()
+        assertFalse(SettingsHelper(context).isBackgroundUpdateCheckOnMeteredAllowed)
+    }
+
+    @Test
+    internal fun `isBackgroundUpdateCheckOnMeteredAllowed with true`() {
+        sharedPreferences.edit().putBoolean("background__update_check__metered", true).commit()
+        assertTrue(SettingsHelper(context).isBackgroundUpdateCheckOnMeteredAllowed)
+    }
+
+    @Test
+    fun `isBackgroundUpdateCheckOnMeteredAllowed with changing value`() {
+        val settingsHelper = SettingsHelper(context)
+        sharedPreferences.edit().putBoolean("background__update_check__metered", false).commit()
+        assertFalse(settingsHelper.isBackgroundUpdateCheckOnMeteredAllowed)
+        sharedPreferences.edit().putBoolean("background__update_check__metered", true).commit()
+        assertTrue(settingsHelper.isBackgroundUpdateCheckOnMeteredAllowed)
+    }
+
+    @Test
+    fun `isBackgroundDownloadEnabled default value`() {
+        assertTrue(SettingsHelper(context).isBackgroundDownloadEnabled)
+    }
+
+    @Test
+    fun `isBackgroundDownloadEnabled with true`() {
+        sharedPreferences.edit().putBoolean("background__download__enabled", true)
+        assertTrue(SettingsHelper(context).isBackgroundDownloadEnabled)
+    }
+
+    @Test
+    fun `isBackgroundDownloadEnabled with false`() {
+        sharedPreferences.edit().putBoolean("background__download__enabled", false)
+        assertFalse(SettingsHelper(context).isBackgroundDownloadEnabled)
+    }
+
+    @Test
+    fun `isBackgroundDownloadEnabled with changing values`() {
+        val settingsHelper = SettingsHelper(context)
+        sharedPreferences.edit().putBoolean("background__download__enabled", false).apply()
+        assertFalse(settingsHelper.isBackgroundDownloadEnabled)
+        sharedPreferences.edit().putBoolean("background__download__enabled", true).apply()
+        assertTrue(settingsHelper.isBackgroundDownloadEnabled)
+    }
+
+    @Test
+    fun `isBackgroundDownloadOnMeteredAllowed default value`() {
+        assertFalse(SettingsHelper(context).isBackgroundDownloadOnMeteredAllowed)
+    }
+
+    @Test
+    fun `isBackgroundDownloadOnMeteredAllowed with true`() {
+        sharedPreferences.edit().putBoolean("background__download__metered", true).apply()
+        assertTrue(SettingsHelper(context).isBackgroundDownloadOnMeteredAllowed)
+    }
+
+    @Test
+    fun `isBackgroundDownloadOnMeteredAllowed with false`() {
+        sharedPreferences.edit().putBoolean("background__download__metered", false).apply()
+        assertFalse(SettingsHelper(context).isBackgroundDownloadOnMeteredAllowed)
+    }
+
+    @Test
+    fun `isBackgroundDownloadOnMeteredAllowed with changing values`() {
+        val settingsHelper = SettingsHelper(context)
+        sharedPreferences.edit().putBoolean("background__download__metered", false).apply()
+        assertFalse(settingsHelper.isBackgroundDownloadOnMeteredAllowed)
+        sharedPreferences.edit().putBoolean("background__download__metered", true).apply()
+        assertTrue(settingsHelper.isBackgroundDownloadOnMeteredAllowed)
+    }
+
+    @Test
+    fun `isBackgroundInstallEnabled default value`() {
+        assertFalse(SettingsHelper(context).isBackgroundInstallationEnabled)
+    }
+
+    @Test
+    fun `isBackgroundInstallEnabled with true`() {
+        sharedPreferences.edit().putBoolean("background__installation__enabled", true).apply()
+        assertTrue(SettingsHelper(context).isBackgroundInstallationEnabled)
+    }
+
+    @Test
+    fun `isBackgroundInstallEnabled with false`() {
+        sharedPreferences.edit().putBoolean("background__installation__enabled", false).apply()
+        assertFalse(SettingsHelper(context).isBackgroundInstallationEnabled)
+    }
+
+    @Test
+    fun `isBackgroundInstallEnabled with changing values`() {
+        val settingsHelper = SettingsHelper(context)
+        sharedPreferences.edit().putBoolean("background__installation__enabled", false).apply()
+        assertFalse(settingsHelper.isBackgroundInstallationEnabled)
+        sharedPreferences.edit().putBoolean("background__installation__enabled", true).apply()
+        assertTrue(settingsHelper.isBackgroundInstallationEnabled)
     }
 
     @Test

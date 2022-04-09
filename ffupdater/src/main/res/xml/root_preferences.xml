@@ -62,14 +62,14 @@
         <SwitchPreferenceCompat
             app:defaultValue="true"
             app:dependency="background__update_check__enabled"
-            app:key="background__download__enable"
+            app:key="background__download__enabled"
             app:singleLineTitle="false"
             app:summary="When an update is detected, download it. This will later speed up the update process."
             app:title="Download app updates" />
 
         <SwitchPreferenceCompat
             app:defaultValue="false"
-            app:dependency="background__download__enable"
+            app:dependency="background__download__enabled"
             app:key="background__download__metered"
             app:singleLineTitle="false"
             app:title="Download app updates on metered networks"
@@ -77,8 +77,8 @@
 
         <SwitchPreferenceCompat
             app:defaultValue="false"
-            app:dependency="background__download__enable"
-            app:key="background__installation_enable"
+            app:dependency="background__download__enabled"
+            app:key="background__installation__enabled"
             app:singleLineTitle="false"
             app:title="Install update"
             app:enabled="false"
