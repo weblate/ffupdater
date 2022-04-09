@@ -1,5 +1,92 @@
 <PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto">
 
+    <de.marmaro.krt.ffupdater.settings.LongSummaryPreferenceCategory
+        app:summary="Settings when the user interface is visible."
+        app:title="Foreground">
+
+        <SwitchPreferenceCompat
+            app:defaultValue="true"
+            app:key="foreground__update_check__metered"
+            app:singleLineTitle="false"
+            app:summary="Allow update checks on metered networks such as mobile data."
+            app:title="Update checks on metered networks" />
+
+        <SwitchPreferenceCompat
+            app:defaultValue="true"
+            app:dependency="foreground__update_check__metered"
+            app:key="foreground__download__metered"
+            app:singleLineTitle="false"
+            app:summary="Useful for users with limited mobile data."
+            app:title="Download updates on metered networks" />
+
+        <ListPreference
+            app:defaultValue="@string/default_theme_preference"
+            app:entries="@array/themeEntries"
+            app:entryValues="@array/themeValues"
+            app:key="themePreference"
+            app:singleLineTitle="false"
+            app:summary="@string/settings__theme_preference_summary"
+            app:title="@string/settings__theme_preference_title" />
+
+    </de.marmaro.krt.ffupdater.settings.LongSummaryPreferenceCategory>
+
+
+    <de.marmaro.krt.ffupdater.settings.LongSummaryPreferenceCategory
+        app:summary="Settings when the app is working in the background and is invisible to the user."
+        app:title="Background">
+
+        <SwitchPreferenceCompat
+            app:defaultValue="true"
+            app:key="background__update_check__enabled"
+            app:singleLineTitle="false"
+            app:summary="Check for new updates at regular intervals."
+            app:title="Update check" />
+
+        <ListPreference
+            app:defaultValue="360"
+            app:dependency="background__update_check__enabled"
+            app:entries="@array/checkIntervalEntries"
+            app:entryValues="@array/checkIntervalValues"
+            app:key="background__update_check__interval"
+            app:singleLineTitle="false"
+            app:title="Update check interval"
+            app:useSimpleSummaryProvider="true" />
+
+        <SwitchPreferenceCompat
+            app:defaultValue="true"
+            app:dependency="background__update_check__enabled"
+            app:key="background__update_check__metered"
+            app:singleLineTitle="false"
+            app:title="Update checks on metered networks" />
+
+        <SwitchPreferenceCompat
+            app:defaultValue="true"
+            app:dependency="background__update_check__enabled"
+            app:key="background__download__enable"
+            app:singleLineTitle="false"
+            app:summary="When an update is detected, download it. This will later speed up the update process."
+            app:title="Download app updates" />
+
+        <SwitchPreferenceCompat
+            app:defaultValue="false"
+            app:dependency="background__download__enable"
+            app:key="background__download__metered"
+            app:singleLineTitle="false"
+            app:title="Download app updates on metered networks"
+            app:summary="Not recommended for users with limited mobile data."/>
+
+        <SwitchPreferenceCompat
+            app:defaultValue="false"
+            app:dependency="background__download__enable"
+            app:key="background__installation_enable"
+            app:singleLineTitle="false"
+            app:title="Install update"
+            app:enabled="false"
+            app:summary="{Not yet implemented!} Try to install the update."/>
+
+
+    </de.marmaro.krt.ffupdater.settings.LongSummaryPreferenceCategory>
+
     <PreferenceCategory app:title="@string/settings__title">
 
         <SwitchPreferenceCompat
@@ -10,8 +97,8 @@
         <SwitchPreferenceCompat
             app:defaultValue="false"
             app:key="onlyUnmeteredNetwork"
-            app:title="@string/settings__ony_unmetered_network_title"
-            app:summary="@string/settings__only_unmetered_network_summary"/>
+            app:summary="@string/settings__only_unmetered_network_summary"
+            app:title="@string/settings__ony_unmetered_network_title" />
 
         <ListPreference
             app:defaultValue="360"
@@ -30,18 +117,6 @@
             app:key="disableApps"
             app:summary="@string/settings__disabled_apps_summary"
             app:title="@string/settings__disabled_apps_title" />
-
-    </PreferenceCategory>
-
-    <PreferenceCategory app:title="@string/settings__category_appearance_title">
-
-        <ListPreference
-            app:defaultValue="@string/default_theme_preference"
-            app:entries="@array/themeEntries"
-            app:entryValues="@array/themeValues"
-            app:key="themePreference"
-            app:summary="@string/settings__theme_preference_summary"
-            app:title="@string/settings__theme_preference_title" />
 
     </PreferenceCategory>
 

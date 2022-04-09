@@ -48,63 +48,72 @@ class SettingsHelperTest {
     }
 
     @Test
-    fun getAutomaticCheck_userHasNotChangedSetting_returnDefaultValueTrue() {
-        assertTrue(SettingsHelper(context).automaticCheck)
+    fun `isBackgroundUpdateCheckEnabled test default value`() {
+        assertTrue(SettingsHelper(context).isBackgroundUpdateCheckEnabled)
     }
 
     @Test
-    fun getAutomaticCheck_userEnabledIt_returnTrue() {
-        sharedPreferences.edit().putBoolean("automaticCheck", true).commit()
-        assertTrue(SettingsHelper(context).automaticCheck)
+    fun `isBackgroundUpdateCheckEnabled return true`() {
+        sharedPreferences.edit().putBoolean("background__update_check__enabled", true).commit()
+        assertTrue(SettingsHelper(context).isBackgroundUpdateCheckEnabled)
     }
 
     @Test
-    fun getAutomaticCheck_userDisabledIt_returnFalse() {
-        sharedPreferences.edit().putBoolean("automaticCheck", false).commit()
-        assertFalse(SettingsHelper(context).automaticCheck)
-    }
-
-    private val defaultCheckIntervalDuration = Duration.ofHours(6)
-
-    @Test
-    fun getCheckInterval_userHasNotChangedSetting_returnDefaultValue() {
-        assertEquals(defaultCheckIntervalDuration, SettingsHelper(context).checkInterval)
+    fun `isBackgroundUpdateCheckEnabled return false`() {
+        sharedPreferences.edit().putBoolean("background__update_check__enabled", false).commit()
+        assertFalse(SettingsHelper(context).isBackgroundUpdateCheckEnabled)
     }
 
     @Test
-    fun getCheckInterval_withInvalidStoredData_null_returnDefaultValue() {
-        sharedPreferences.edit().putString("checkInterval", null).commit()
-        assertEquals(defaultCheckIntervalDuration, SettingsHelper(context).checkInterval)
+    fun `isBackgroundUpdateCheckEnabled dont cache value`() {
+        val settingsHelper = SettingsHelper(context)
+
+        sharedPreferences.edit().putBoolean("background__update_check__enabled", false).commit()
+        assertFalse(settingsHelper.isBackgroundUpdateCheckEnabled)
+
+        sharedPreferences.edit().putBoolean("background__update_check__enabled", true).commit()
+        assertTrue(settingsHelper.isBackgroundUpdateCheckEnabled)
     }
 
     @Test
-    fun getCheckInterval_withInvalidStoredData_emptyString_returnDefaultValue() {
-        sharedPreferences.edit().putString("checkInterval", "").commit()
-        assertEquals(defaultCheckIntervalDuration, SettingsHelper(context).checkInterval)
+    fun `backgroundUpdateCheckInterval with no settings`() {
+        assertEquals(Duration.ofHours(6), SettingsHelper(context).backgroundUpdateCheckInterval)
     }
 
     @Test
-    fun getCheckInterval_withInvalidStoredData_text_returnDefaultValue() {
-        sharedPreferences.edit().putString("checkInterval", "lorem ipsum").commit()
-        assertEquals(defaultCheckIntervalDuration, SettingsHelper(context).checkInterval)
+    fun `backgroundUpdateCheckInterval with invalid setting null`() {
+        sharedPreferences.edit().putString("background__update_check__interval", null).commit()
+        assertEquals(Duration.ofHours(6), SettingsHelper(context).backgroundUpdateCheckInterval)
     }
 
     @Test
-    fun getCheckInterval_withPositiveValue_returnValue() {
-        sharedPreferences.edit().putString("checkInterval", "42").commit()
-        assertEquals(Duration.ofMinutes(42), SettingsHelper(context).checkInterval)
+    fun `backgroundUpdateCheckInterval with invalid setting empty string`() {
+        sharedPreferences.edit().putString("background__update_check__interval", "").commit()
+        assertEquals(Duration.ofHours(6), SettingsHelper(context).backgroundUpdateCheckInterval)
     }
 
     @Test
-    fun getCheckInterval_withNegativeValue_returnDefaultValue() {
-        sharedPreferences.edit().putString("checkInterval", "-1").commit()
-        assertEquals(defaultCheckIntervalDuration, SettingsHelper(context).checkInterval)
+    fun `backgroundUpdateCheckInterval with invalid setting string`() {
+        sharedPreferences.edit().putString("background__update_check__interval", "lorem ipsum").commit()
+        assertEquals(Duration.ofHours(6), SettingsHelper(context).backgroundUpdateCheckInterval)
     }
 
     @Test
-    fun getCheckInterval_withTooHighNumber_returnDefaultValue() {
+    fun `backgroundUpdateCheckInterval with 42 minutes`() {
+        sharedPreferences.edit().putString("background__update_check__interval", "42").commit()
+        assertEquals(Duration.ofMinutes(42), SettingsHelper(context).backgroundUpdateCheckInterval)
+    }
+
+    @Test
+    fun `backgroundUpdateCheckInterval with too low value`() {
+        sharedPreferences.edit().putString("background__update_check__interval", "-1").commit()
+        assertEquals(Duration.ofMinutes(15), SettingsHelper(context).backgroundUpdateCheckInterval)
+    }
+
+    @Test
+    fun `backgroundUpdateCheckInterval with too high value`() {
         sharedPreferences.edit().putString("checkInterval", "57600" /*40 days*/).commit()
-        assertEquals(defaultCheckIntervalDuration, SettingsHelper(context).checkInterval)
+        assertEquals(Duration.ofDays(7), SettingsHelper(context).backgroundUpdateCheckInterval)
     }
 
     @Test

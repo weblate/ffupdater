@@ -142,7 +142,7 @@ class BackgroundJob(context: Context, workerParams: WorkerParameters) :
         private const val RUN_ATTEMPTS_FOR_63MIN_TOTAL = 7
 
         fun startOrStopBackgroundUpdateCheck(context: Context) {
-            if (SettingsHelper(context).automaticCheck) {
+            if (SettingsHelper(context).isBackgroundUpdateCheckEnabled) {
                 startBackgroundUpdateCheck(context)
             } else {
                 stopBackgroundUpdateCheck(context)
@@ -161,7 +161,7 @@ class BackgroundJob(context: Context, workerParams: WorkerParameters) :
 
             val workRequest = PeriodicWorkRequest.Builder(
                 BackgroundJob::class.java,
-                settingsHelper.checkInterval.toMinutes(),
+                settingsHelper.backgroundUpdateCheckInterval.toMinutes(),
                 MINUTES
             )
                 .setConstraints(constraints.build())

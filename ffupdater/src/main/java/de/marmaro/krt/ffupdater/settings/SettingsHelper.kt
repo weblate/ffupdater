@@ -17,28 +17,20 @@ class SettingsHelper(context: Context) {
     /**
      * @return should the regular background update check be enabled?
      */
-    val automaticCheck: Boolean
-        get() {
-            return preferences.getBoolean("automaticCheck", true)
-        }
+    val isBackgroundUpdateCheckEnabled: Boolean
+        get() = preferences.getBoolean("background__update_check__enabled", true)
 
     /**
      * @return how long should be the time span between check background update check?
      */
-    val checkInterval: Duration
+    val backgroundUpdateCheckInterval: Duration
         get() {
-            val default = Duration.ofHours(6)
-            val rawValue = preferences.getString("checkInterval", null) ?: return default
-            val checkInterval: Long
-            try {
-                checkInterval = rawValue.toLong()
-            } catch (_: NumberFormatException) {
-                return default
-            }
-            if (checkInterval < 0 || checkInterval > Duration.ofDays(35).toMinutes()) {
-                return default
-            }
-            return Duration.ofMinutes(checkInterval)
+            val minutesAsString = preferences.getString("background__update_check__interval", null)
+            // if undefined or invalid -> use 360 minutes (6 hours)
+            val minutes = minutesAsString?.toLongOrNull() ?: 360L
+            // keep minutes in range between 15 minutes and 40320 minutes (1 week)
+            val minutesInRange = minutes.coerceIn(15L, 40320L)
+            return Duration.ofMinutes(minutesInRange)
         }
 
     /**
@@ -79,10 +71,12 @@ class SettingsHelper(context: Context) {
             return default
         }
 
-        val validThemes = listOf(MODE_NIGHT_FOLLOW_SYSTEM,
-                MODE_NIGHT_AUTO_BATTERY,
-                MODE_NIGHT_YES,
-                MODE_NIGHT_NO)
+        val validThemes = listOf(
+            MODE_NIGHT_FOLLOW_SYSTEM,
+            MODE_NIGHT_AUTO_BATTERY,
+            MODE_NIGHT_YES,
+            MODE_NIGHT_NO
+        )
         return if (validThemes.contains(themePreference)) {
             themePreference
         } else default
