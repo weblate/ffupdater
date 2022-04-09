@@ -73,7 +73,7 @@ class InstallActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.install_activity)
         CrashListener.openCrashReporterForUncaughtExceptions(this)
-        AppCompatDelegate.setDefaultNightMode(SettingsHelper(this).getThemePreference())
+        AppCompatDelegate.setDefaultNightMode(SettingsHelper(this).themePreference)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
         val passedAppName = intent.extras?.getString(EXTRA_APP_NAME)
@@ -499,10 +499,8 @@ class InstallActivity : AppCompatActivity() {
             ia.show(R.id.install_activity__open_cache_folder)
             var error = ia.appInstallationFailedErrorMessage
             if (error != null) {
-                if (error.contains("INSTALL_FAILED_INTERNAL_ERROR") &&
-                    error.contains("Permission Denied")
-                ) {
-                    error += "\n\n" + ia.getString(R.string.install_activity__try_disable_miui_optimization)
+                if ("INSTALL_FAILED_INTERNAL_ERROR" in error && "Permission Denied" in error) {
+                    error += "\n\n${ia.getString(R.string.install_activity__try_disable_miui_optimization)}"
                 }
                 ia.setText(R.id.installerFailedReason, error)
             }

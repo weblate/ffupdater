@@ -14,6 +14,24 @@ import java.time.Duration
 class SettingsHelper(context: Context) {
     private val preferences = PreferenceManager.getDefaultSharedPreferences(context)
 
+    private val validAndroidThemes = listOf(
+        MODE_NIGHT_FOLLOW_SYSTEM,
+        MODE_NIGHT_AUTO_BATTERY,
+        MODE_NIGHT_YES,
+        MODE_NIGHT_NO
+    )
+
+    val themePreference: Int
+        get() {
+            val theme = preferences.getString("themePreference", null)?.toIntOrNull()
+            return when {
+                theme in validAndroidThemes -> theme!!
+                // return default values because theme is invalid and could be null
+                DeviceSdkTester.supportsAndroid10() -> MODE_NIGHT_FOLLOW_SYSTEM
+                else -> MODE_NIGHT_AUTO_BATTERY
+            }
+        }
+
     /**
      * @return should the regular background update check be enabled?
      */
@@ -25,12 +43,11 @@ class SettingsHelper(context: Context) {
      */
     val backgroundUpdateCheckInterval: Duration
         get() {
-            val minutesAsString = preferences.getString("background__update_check__interval", null)
-            // if undefined or invalid -> use 360 minutes (6 hours)
-            val minutes = minutesAsString?.toLongOrNull() ?: 360L
+            val minutes = preferences.getString("background__update_check__interval", null)?.toLongOrNull()
             // keep minutes in range between 15 minutes and 40320 minutes (1 month)
-            val minutesInRange = minutes.coerceIn(15L, 40320L)
-            return Duration.ofMinutes(minutesInRange)
+            // if undefined or invalid -> use 360 minutes (6 hours)
+            val result = minutes?.coerceIn(15L, 40320L) ?: 360L
+            return Duration.ofMinutes(result)
         }
 
     val isBackgroundUpdateCheckOnMeteredAllowed: Boolean
@@ -62,38 +79,7 @@ class SettingsHelper(context: Context) {
             }
         }
 
-    /**
-     * If the app is started for the first time, the method will return AppCompatDelegate.MODE_NIGHT_NO.
-     * If not, then the default value from R.string.default_theme_preference or the user setting will be returned.
-     *
-     * @return AppCompatDelegate.MODE_NIGHT_NO, AppCompatDelegate.MODE_NIGHT_YES, ...
-     */
-    fun getThemePreference(): Int {
-        val default = if (DeviceSdkTester.supportsAndroid10()) {
-            MODE_NIGHT_FOLLOW_SYSTEM
-        } else {
-            MODE_NIGHT_AUTO_BATTERY
-        }
-
-        val rawValue = preferences.getString("themePreference", null)
-        val themePreference: Int
-        try {
-            themePreference = rawValue?.toInt() ?: return default
-        } catch (_: NumberFormatException) {
-            return default
-        }
-
-        val validThemes = listOf(
-            MODE_NIGHT_FOLLOW_SYSTEM,
-            MODE_NIGHT_AUTO_BATTERY,
-            MODE_NIGHT_YES,
-            MODE_NIGHT_NO
-        )
-        return if (validThemes.contains(themePreference)) {
-            themePreference
-        } else default
-    }
-
+    @Deprecated("entfernen")
     val onlyUnmeteredNetwork: Boolean
         get() {
             return preferences.getBoolean("onlyUnmeteredNetwork", false)

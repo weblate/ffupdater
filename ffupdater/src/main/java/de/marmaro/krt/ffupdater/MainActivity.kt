@@ -54,7 +54,7 @@ class MainActivity : AppCompatActivity() {
         if (BuildConfig.BUILD_TYPE == "debug") {
             StrictModeSetup.enableStrictMode()
         }
-        AppCompatDelegate.setDefaultNightMode(SettingsHelper(this).getThemePreference())
+        AppCompatDelegate.setDefaultNightMode(SettingsHelper(this).themePreference)
         Migrator().migrate(this)
 
         val deviceAbis = DeviceAbiExtractor.findSupportedAbis()
