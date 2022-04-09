@@ -71,7 +71,7 @@ class BackgroundJob(context: Context, workerParams: WorkerParameters) :
         }
 
         val appsWithUpdates = findAppsWithUpdates()
-        if (NetworkUtil.isActiveNetworkUnmetered(applicationContext) &&
+        if (NetworkUtil.isNetworkUnmetered(applicationContext) &&
             StorageUtil.isEnoughStorageAvailable() &&
             appsWithUpdates.isNotEmpty()
         ) {

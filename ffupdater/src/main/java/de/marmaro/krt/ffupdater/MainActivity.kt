@@ -184,7 +184,7 @@ class MainActivity : AppCompatActivity() {
             abortUpdateCheck(R.string.main_activity__no_internet_connection)
             return
         }
-        if (!settingsHelper.isForegroundUpdateCheckOnMeteredAllowed && NetworkUtil.isActiveNetworkMetered(this)) {
+        if (!settingsHelper.isForegroundUpdateCheckOnMeteredAllowed && NetworkUtil.isNetworkMetered(this)) {
             abortUpdateCheck(R.string.main_activity__no_unmetered_network)
             return
         }
@@ -236,9 +236,9 @@ class MainActivity : AppCompatActivity() {
             showToast(R.string.main_activity__no_internet_connection)
             return
         }
-        if (!settingsHelper.isForegroundUpdateCheckOnMeteredAllowed && NetworkUtil.isActiveNetworkMetered(this)) {
+        if (!settingsHelper.isForegroundUpdateCheckOnMeteredAllowed && NetworkUtil.isNetworkMetered(this)) {
             showToast(R.string.main_activity__no_unmetered_network)
-            return
+            //return
         }
         if (askForConfirmationIfOtherDownloadsAreRunning && AppDownloadStatus.areDownloadsInBackgroundActive()) {
             RunningDownloadsDialog.newInstance(app).show(supportFragmentManager)

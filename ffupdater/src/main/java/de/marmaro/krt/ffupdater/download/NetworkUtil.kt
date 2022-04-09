@@ -44,10 +44,10 @@ object NetworkUtil {
         return cm.activeNetworkInfo?.isConnected == true
     }
 
-    fun isActiveNetworkUnmetered(context: Context): Boolean {
+    fun isNetworkUnmetered(context: Context): Boolean {
         val cm = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
         return !cm.isActiveNetworkMetered
     }
 
-    fun isActiveNetworkMetered(context: Context): Boolean = !isActiveNetworkUnmetered(context)
+    fun isNetworkMetered(context: Context): Boolean = !isNetworkUnmetered(context)
 }

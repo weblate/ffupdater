@@ -63,6 +63,7 @@ class InstallActivity : AppCompatActivity() {
         var app: App? = null
         var fileDownloader: FileDownloader? = null
         var updateCheckResult: UpdateCheckResult? = null
+        var error: Pair<Int?, Exception?>? = null
         var fetchUrlException: Exception? = null
         var fetchUrlExceptionText: String? = null
     }
@@ -190,7 +191,7 @@ class InstallActivity : AppCompatActivity() {
         START(InstallActivity::start),
         CHECK_IF_STORAGE_IS_MOUNTED(InstallActivity::checkIfStorageIsMounted),
         CHECK_FOR_ENOUGH_STORAGE(InstallActivity::checkForEnoughStorage),
-        PRECONDITIONS_ARE_CHECKED(InstallActivity::fetchDownloadInformation),
+        FETCH_DOWNLOAD_INFORMATION(InstallActivity::fetchDownloadInformation),
         START_DOWNLOAD(InstallActivity::startDownload),
         REUSE_CURRENT_DOWNLOAD(InstallActivity::reuseCurrentDownload),
         DOWNLOAD_WAS_SUCCESSFUL(InstallActivity::downloadWasSuccessful),
@@ -239,13 +240,13 @@ class InstallActivity : AppCompatActivity() {
         @MainThread
         fun checkForEnoughStorage(ia: InstallActivity): State {
             if (StorageUtil.isEnoughStorageAvailable()) {
-                return PRECONDITIONS_ARE_CHECKED
+                return FETCH_DOWNLOAD_INFORMATION
             }
             ia.show(R.id.tooLowMemory)
             val mbs = StorageUtil.getFreeStorageInMebibytes()
             val message = ia.getString(R.string.install_activity__too_low_memory_description, mbs)
             ia.setText(R.id.tooLowMemoryDescription, message)
-            return PRECONDITIONS_ARE_CHECKED
+            return FETCH_DOWNLOAD_INFORMATION
         }
 
         @MainThread
@@ -260,25 +261,18 @@ class InstallActivity : AppCompatActivity() {
             ia.setText(R.id.fetchUrlTextView, runningText)
 
             // check if network type requirements are met
-            if (!ia.settingsHelper.isForegroundUpdateCheckOnMeteredAllowed &&
-                NetworkUtil.isActiveNetworkMetered(ia)
-            ) {
-                ia.viewModel.fetchUrlExceptionText =
-                    ia.getString(R.string.main_activity__no_unmetered_network)
+            if (!ia.settingsHelper.isForegroundUpdateCheckOnMeteredAllowed && NetworkUtil.isNetworkMetered(ia)) {
+                ia.viewModel.error = Pair(R.string.main_activity__no_unmetered_network, null)
                 return FAILURE_SHOW_FETCH_URL_EXCEPTION
             }
 
             val updateCheckResult = try {
                 app.detail.updateCheck(ia)
             } catch (e: GithubRateLimitExceededException) {
-                ia.viewModel.fetchUrlException = e
-                ia.viewModel.fetchUrlExceptionText =
-                    ia.getString(R.string.install_activity__github_rate_limit_exceeded)
+                ia.viewModel.error = Pair(R.string.install_activity__github_rate_limit_exceeded, e)
                 return FAILURE_SHOW_FETCH_URL_EXCEPTION
             } catch (e: NetworkException) {
-                ia.viewModel.fetchUrlException = e
-                ia.viewModel.fetchUrlExceptionText =
-                    ia.getString(R.string.install_activity__temporary_network_issue)
+                ia.viewModel.error = Pair(R.string.install_activity__temporary_network_issue, e)
                 return FAILURE_SHOW_FETCH_URL_EXCEPTION
             }
 
@@ -302,15 +296,18 @@ class InstallActivity : AppCompatActivity() {
 
         @MainThread
         suspend fun startDownload(ia: InstallActivity): State {
+            if (!ia.settingsHelper.isForegroundDownloadOnMeteredAllowed && NetworkUtil.isNetworkMetered(ia)) {
+                ia.viewModel.error = Pair(R.string.main_activity__no_unmetered_network, null)
+                return FAILURE_SHOW_FETCH_URL_EXCEPTION
+            }
+
             val updateCheckResult = requireNotNull(ia.viewModel.updateCheckResult)
             ia.show(R.id.downloadingFile)
             ia.setText(R.id.downloadingFileUrl, updateCheckResult.downloadUrl)
-            ia.appCache.delete(ia)
+
             val setDownloadingFileText = { text: String ->
-                ia.setText(
-                    R.id.downloadingFileText,
-                    ia.getString(R.string.install_activity__download_app_with_status, text)
-                )
+                val display = ia.getString(R.string.install_activity__download_app_with_status, text)
+                ia.setText(R.id.downloadingFileText, display)
             }
             val fileDownloader = FileDownloader()
             fileDownloader.onProgress = { percentage, mb ->
@@ -327,6 +324,7 @@ class InstallActivity : AppCompatActivity() {
             setDownloadingFileText(" %")
 
             val url = updateCheckResult.availableResult.downloadUrl
+            ia.appCache.delete(ia)
             val file = ia.appCache.getFile(ia)
 
             AppDownloadStatus.foregroundDownloadIsStarted()
@@ -528,9 +526,9 @@ class InstallActivity : AppCompatActivity() {
         fun failureShowFetchUrlException(ia: InstallActivity): State {
             ia.hide(R.id.fetchUrl)
             ia.show(R.id.install_activity__exception)
-            val text = ia.viewModel.fetchUrlExceptionText ?: "/"
+            val text = ia.viewModel.error?.first?.let { ia.getString(it) } ?: "/"
             ia.setText(R.id.install_activity__exception__text, text)
-            val exception = ia.viewModel.fetchUrlException
+            val exception = ia.viewModel.error?.second
             if (exception == null) {
                 ia.hide(install_activity__exception__show_button)
             } else {
