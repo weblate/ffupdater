@@ -149,22 +149,22 @@ class SettingsHelperTest {
 
     @Test
     fun `isBackgroundDownloadEnabled with true`() {
-        sharedPreferences.edit().putBoolean("background__download__enabled", true)
+        sharedPreferences.edit().putBoolean("background__download__enabled", true).commit()
         assertTrue(SettingsHelper(context).isBackgroundDownloadEnabled)
     }
 
     @Test
     fun `isBackgroundDownloadEnabled with false`() {
-        sharedPreferences.edit().putBoolean("background__download__enabled", false)
+        sharedPreferences.edit().putBoolean("background__download__enabled", false).commit()
         assertFalse(SettingsHelper(context).isBackgroundDownloadEnabled)
     }
 
     @Test
     fun `isBackgroundDownloadEnabled with changing values`() {
         val settingsHelper = SettingsHelper(context)
-        sharedPreferences.edit().putBoolean("background__download__enabled", false).apply()
+        sharedPreferences.edit().putBoolean("background__download__enabled", false).commit()
         assertFalse(settingsHelper.isBackgroundDownloadEnabled)
-        sharedPreferences.edit().putBoolean("background__download__enabled", true).apply()
+        sharedPreferences.edit().putBoolean("background__download__enabled", true).commit()
         assertTrue(settingsHelper.isBackgroundDownloadEnabled)
     }
 
@@ -175,22 +175,22 @@ class SettingsHelperTest {
 
     @Test
     fun `isBackgroundDownloadOnMeteredAllowed with true`() {
-        sharedPreferences.edit().putBoolean("background__download__metered", true).apply()
+        sharedPreferences.edit().putBoolean("background__download__metered", true).commit()
         assertTrue(SettingsHelper(context).isBackgroundDownloadOnMeteredAllowed)
     }
 
     @Test
     fun `isBackgroundDownloadOnMeteredAllowed with false`() {
-        sharedPreferences.edit().putBoolean("background__download__metered", false).apply()
+        sharedPreferences.edit().putBoolean("background__download__metered", false).commit()
         assertFalse(SettingsHelper(context).isBackgroundDownloadOnMeteredAllowed)
     }
 
     @Test
     fun `isBackgroundDownloadOnMeteredAllowed with changing values`() {
         val settingsHelper = SettingsHelper(context)
-        sharedPreferences.edit().putBoolean("background__download__metered", false).apply()
+        sharedPreferences.edit().putBoolean("background__download__metered", false).commit()
         assertFalse(settingsHelper.isBackgroundDownloadOnMeteredAllowed)
-        sharedPreferences.edit().putBoolean("background__download__metered", true).apply()
+        sharedPreferences.edit().putBoolean("background__download__metered", true).commit()
         assertTrue(settingsHelper.isBackgroundDownloadOnMeteredAllowed)
     }
 
@@ -201,22 +201,22 @@ class SettingsHelperTest {
 
     @Test
     fun `isBackgroundInstallEnabled with true`() {
-        sharedPreferences.edit().putBoolean("background__installation__enabled", true).apply()
+        sharedPreferences.edit().putBoolean("background__installation__enabled", true).commit()
         assertTrue(SettingsHelper(context).isBackgroundInstallationEnabled)
     }
 
     @Test
     fun `isBackgroundInstallEnabled with false`() {
-        sharedPreferences.edit().putBoolean("background__installation__enabled", false).apply()
+        sharedPreferences.edit().putBoolean("background__installation__enabled", false).commit()
         assertFalse(SettingsHelper(context).isBackgroundInstallationEnabled)
     }
 
     @Test
     fun `isBackgroundInstallEnabled with changing values`() {
         val settingsHelper = SettingsHelper(context)
-        sharedPreferences.edit().putBoolean("background__installation__enabled", false).apply()
+        sharedPreferences.edit().putBoolean("background__installation__enabled", false).commit()
         assertFalse(settingsHelper.isBackgroundInstallationEnabled)
-        sharedPreferences.edit().putBoolean("background__installation__enabled", true).apply()
+        sharedPreferences.edit().putBoolean("background__installation__enabled", true).commit()
         assertTrue(settingsHelper.isBackgroundInstallationEnabled)
     }
 
