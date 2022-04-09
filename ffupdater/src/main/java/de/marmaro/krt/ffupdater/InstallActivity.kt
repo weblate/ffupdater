@@ -25,10 +25,7 @@ import de.marmaro.krt.ffupdater.app.UpdateCheckResult
 import de.marmaro.krt.ffupdater.app.impl.exceptions.GithubRateLimitExceededException
 import de.marmaro.krt.ffupdater.app.impl.exceptions.NetworkException
 import de.marmaro.krt.ffupdater.crash.CrashListener
-import de.marmaro.krt.ffupdater.download.AppCache
-import de.marmaro.krt.ffupdater.download.AppDownloadStatus
-import de.marmaro.krt.ffupdater.download.FileDownloader
-import de.marmaro.krt.ffupdater.download.StorageUtil
+import de.marmaro.krt.ffupdater.download.*
 import de.marmaro.krt.ffupdater.installer.AppInstaller
 import de.marmaro.krt.ffupdater.security.FingerprintValidator
 import de.marmaro.krt.ffupdater.security.FingerprintValidator.CertificateValidationResult
@@ -51,6 +48,7 @@ class InstallActivity : AppCompatActivity() {
     private lateinit var fingerprintValidator: FingerprintValidator
     private lateinit var appInstaller: AppInstaller
     private lateinit var appCache: AppCache
+    private lateinit var settingsHelper: SettingsHelper
 
     // necessary for communication with State enums
     private lateinit var app: App
@@ -84,6 +82,7 @@ class InstallActivity : AppCompatActivity() {
         }
         app = App.valueOf(passedAppName)
 
+        settingsHelper = SettingsHelper(this)
         fingerprintValidator = FingerprintValidator(packageManager)
         appInstaller = AppInstaller.create(
             successfulInstallationCallback = {
@@ -191,7 +190,7 @@ class InstallActivity : AppCompatActivity() {
         START(InstallActivity::start),
         CHECK_IF_STORAGE_IS_MOUNTED(InstallActivity::checkIfStorageIsMounted),
         CHECK_FOR_ENOUGH_STORAGE(InstallActivity::checkForEnoughStorage),
-        PRECONDITIONS_ARE_CHECKED(InstallActivity::preconditionsAreChecked),
+        PRECONDITIONS_ARE_CHECKED(InstallActivity::fetchDownloadInformation),
         START_DOWNLOAD(InstallActivity::startDownload),
         REUSE_CURRENT_DOWNLOAD(InstallActivity::reuseCurrentDownload),
         DOWNLOAD_WAS_SUCCESSFUL(InstallActivity::downloadWasSuccessful),
@@ -250,7 +249,7 @@ class InstallActivity : AppCompatActivity() {
         }
 
         @MainThread
-        suspend fun preconditionsAreChecked(ia: InstallActivity): State {
+        suspend fun fetchDownloadInformation(ia: InstallActivity): State {
             val app = ia.app
             ia.show(R.id.fetchUrl)
             val downloadSource = ia.getString(app.detail.displayDownloadSource)
@@ -259,6 +258,15 @@ class InstallActivity : AppCompatActivity() {
                 downloadSource
             )
             ia.setText(R.id.fetchUrlTextView, runningText)
+
+            // check if network type requirements are met
+            if (!ia.settingsHelper.isForegroundUpdateCheckOnMeteredAllowed &&
+                NetworkUtil.isActiveNetworkMetered(ia)
+            ) {
+                ia.viewModel.fetchUrlExceptionText =
+                    ia.getString(R.string.main_activity__no_unmetered_network)
+                return FAILURE_SHOW_FETCH_URL_EXCEPTION
+            }
 
             val updateCheckResult = try {
                 app.detail.updateCheck(ia)
@@ -523,14 +531,14 @@ class InstallActivity : AppCompatActivity() {
             val text = ia.viewModel.fetchUrlExceptionText ?: "/"
             ia.setText(R.id.install_activity__exception__text, text)
             val exception = ia.viewModel.fetchUrlException
-            if (exception != null) {
-                ia.findViewById<TextView>(install_activity__exception__show_button)
-                    .setOnClickListener {
-                        val description =
-                            ia.getString(crash_report__explain_text__install_activity_fetching_url)
-                        val intent = CrashReportActivity.createIntent(ia, exception, description)
-                        ia.startActivity(intent)
-                    }
+            if (exception == null) {
+                ia.hide(install_activity__exception__show_button)
+            } else {
+                ia.findViewById<TextView>(install_activity__exception__show_button).setOnClickListener {
+                    val description = ia.getString(crash_report__explain_text__install_activity_fetching_url)
+                    val intent = CrashReportActivity.createIntent(ia, exception, description)
+                    ia.startActivity(intent)
+                }
             }
             return ERROR_STOP
         }
