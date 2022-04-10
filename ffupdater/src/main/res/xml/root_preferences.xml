@@ -1,8 +1,8 @@
 <PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <de.marmaro.krt.ffupdater.settings.LongSummaryPreferenceCategory
-        app:summary="@string/settings__foreground_category__title"
-        app:title="Foreground">
+        app:summary="@string/settings__foreground_category__summary"
+        app:title="@string/settings__foreground_category__title">
 
         <SwitchPreferenceCompat
             app:defaultValue="true"
@@ -32,8 +32,8 @@
 
 
     <de.marmaro.krt.ffupdater.settings.LongSummaryPreferenceCategory
-        app:summary="@string/settings__background_category__title"
-        app:title="Background">
+        app:summary="@string/settings__background_category__summary"
+        app:title="@string/settings__background_category__title">
 
         <SwitchPreferenceCompat
             app:defaultValue="true"
