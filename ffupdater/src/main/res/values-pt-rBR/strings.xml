@@ -125,12 +125,14 @@
     <string name="settings__background__update_check__excluded_apps__title">Excluir aplicações da verificação de atualização</string>
     <string name="settings__background__update_check__interval__title">Intervalo de verificação de atualização</string>
     <string name="settings__background__update_check__metered__title">Atualização de verificações em redes dosadoras</string>
+    <string name="settings__background_category__title">Configurações quando o aplicativo está trabalhando em segundo plano e é invisível para o usuário.</string>
     <string name="settings__foreground__download__metered__summary">Útil para usuários com dados móveis limitados.</string>
     <string name="settings__foreground__download__metered__title">Download de atualizações em redes dosadoras</string>
     <string name="settings__foreground__theme_preference__summary">Define o tema preferido</string>
     <string name="settings__foreground__theme_preference__title">Escolha o tema</string>
     <string name="settings__foreground__update_check__metered__summary">Permitir verificações de atualização em redes de medição, tais como dados móveis.</string>
     <string name="settings__foreground__update_check__metered__title">Atualização de verificações em redes dosadoras</string>
+    <string name="settings__foreground_category__title">Configurações quando a interface do usuário é visível.</string>
     <string name="settings__theme_battery_saver">Usar escuro se a Economia da Bateria for ativada</string>
     <string name="settings__theme_dark">Escuro</string>
     <string name="settings__theme_light">Claro</string>

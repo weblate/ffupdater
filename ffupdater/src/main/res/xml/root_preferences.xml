@@ -1,7 +1,7 @@
 <PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <de.marmaro.krt.ffupdater.settings.LongSummaryPreferenceCategory
-        app:summary="Settings when the user interface is visible."
+        app:summary="@string/settings__foreground_category__title"
         app:title="Foreground">
 
         <SwitchPreferenceCompat
@@ -32,7 +32,7 @@
 
 
     <de.marmaro.krt.ffupdater.settings.LongSummaryPreferenceCategory
-        app:summary="Settings when the app is working in the background and is invisible to the user."
+        app:summary="@string/settings__background_category__title"
         app:title="Background">
 
         <SwitchPreferenceCompat
@@ -92,7 +92,6 @@
             app:singleLineTitle="false"
             app:summary="@string/settings__background__installation__enabled__summary"
             app:title="@string/settings__background__installation__enabled__title" />
-
 
     </de.marmaro.krt.ffupdater.settings.LongSummaryPreferenceCategory>
 

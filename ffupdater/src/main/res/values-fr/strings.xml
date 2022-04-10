@@ -125,12 +125,14 @@
     <string name="settings__background__update_check__excluded_apps__title">Exclure les applications de la vérification des mises à jour</string>
     <string name="settings__background__update_check__interval__title">Intervalle de vérification de la mise à jour</string>
     <string name="settings__background__update_check__metered__title">Contrôles de mise à jour sur les réseaux de compteurs</string>
+    <string name="settings__background_category__title">Paramètres lorsque l\'application fonctionne en arrière-plan et est invisible pour l'utilisateur.</string>
     <string name="settings__foreground__download__metered__summary">Utile pour les utilisateurs dont les données mobiles sont limitées.</string>
     <string name="settings__foreground__download__metered__title">Télécharger les mises à jour sur les réseaux avec compteur</string>
     <string name="settings__foreground__theme_preference__summary">Choisissez entre un thème clair et un thème sombre</string>
     <string name="settings__foreground__theme_preference__title">Choisissez un thème</string>
     <string name="settings__foreground__update_check__metered__summary">Autorisez les vérifications de mise à jour sur les réseaux avec compteur, comme les données mobiles.</string>
     <string name="settings__foreground__update_check__metered__title">Contrôles de mise à jour sur les réseaux de compteurs</string>
+    <string name="settings__foreground_category__title">Paramètres lorsque l\'interface utilisateur est visible.</string>
     <string name="settings__theme_battery_saver">Sombre lorsque l\'économiseur de batterie est actif</string>
     <string name="settings__theme_dark">Foncé</string>
     <string name="settings__theme_light">Lumière</string>
