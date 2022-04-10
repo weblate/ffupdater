@@ -9,6 +9,7 @@ import androidx.annotation.RequiresApi
 import de.marmaro.krt.ffupdater.device.DeviceSdkTester
 
 object NetworkUtil {
+    @Deprecated("ich sollte diese Methode durch try/catch ersetzen, weil unzuverlässig")
     @AnyThread
     fun isInternetUnavailable(context: Context): Boolean {
         val cm = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
