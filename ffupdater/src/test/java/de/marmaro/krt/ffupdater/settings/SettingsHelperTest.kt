@@ -17,7 +17,11 @@ import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.Arguments
+import org.junit.jupiter.params.provider.MethodSource
 import java.time.Duration
+import java.util.stream.Stream
 
 @ExtendWith(MockKExtension::class)
 class SettingsHelperTest {
@@ -45,6 +49,22 @@ class SettingsHelperTest {
         internal fun afterAll() {
             unmockkObject(DeviceSdkTester)
         }
+
+        @JvmStatic
+        fun excludedAppsFromBackgroundUpdateCheck_data(): Stream<Arguments> = Stream.of(
+            Arguments.of(App.BRAVE, "BRAVE"),
+            Arguments.of(App.BROMITE, "BROMITE"),
+            Arguments.of(App.FFUPDATER, "FFUPDATER"),
+            Arguments.of(App.FIREFOX_BETA, "FIREFOX_BETA"),
+            Arguments.of(App.FIREFOX_FOCUS, "FIREFOX_FOCUS"),
+            Arguments.of(App.FIREFOX_KLAR, "FIREFOX_KLAR"),
+            Arguments.of(App.FIREFOX_NIGHTLY, "FIREFOX_NIGHTLY"),
+            Arguments.of(App.FIREFOX_RELEASE, "FIREFOX_RELEASE"),
+            Arguments.of(App.ICERAVEN, "ICERAVEN"),
+            Arguments.of(App.LOCKWISE, "LOCKWISE"),
+            Arguments.of(App.UNGOOGLED_CHROMIUM, "UNGOOGLED_CHROMIUM"),
+            Arguments.of(App.VIVALDI, "VIVALDI"),
+        )
     }
 
     @Test
@@ -277,89 +297,44 @@ class SettingsHelperTest {
     }
 
     @Test
-    fun getDisableApps_userHasNotChangedSetting_returnEmptySet() {
+    fun `excludedAppsFromBackgroundUpdateCheck with default value`() {
         assertTrue(SettingsHelper(context).excludedAppsFromBackgroundUpdateCheck.isEmpty())
     }
 
     @Test
-    fun getDisableApps_withValue_null_returnEmptySet() {
-        sharedPreferences.edit().putStringSet("disabledApps", null).commit()
+    fun `excludedAppsFromBackgroundUpdateCheck with null`() {
+        sharedPreferences.edit().putStringSet("background__update_check__excluded_apps", null).commit()
         assertTrue(SettingsHelper(context).excludedAppsFromBackgroundUpdateCheck.isEmpty())
     }
 
     @Test
-    fun getDisableApps_withEmptySet_returnEmptySet() {
-        sharedPreferences.edit().putStringSet("disabledApps", setOf()).commit()
+    fun `excludedAppsFromBackgroundUpdateCheck with empty set`() {
+        sharedPreferences.edit().putStringSet("background__update_check__excluded_apps", setOf()).commit()
         assertTrue(SettingsHelper(context).excludedAppsFromBackgroundUpdateCheck.isEmpty())
     }
 
-    @Test
-    fun getDisableApps_withOneApp_Brave_returnApps() {
-        sharedPreferences.edit().putStringSet("disableApps", setOf("BRAVE")).commit()
+    @ParameterizedTest(name = "excludedAppsFromBackgroundUpdateCheck with app \"{0}\"")
+    @MethodSource("excludedAppsFromBackgroundUpdateCheck_data")
+    fun `excludedAppsFromBackgroundUpdateCheck with app X`(app: App, name: String) {
+        sharedPreferences.edit()
+            .putStringSet("background__update_check__excluded_apps", setOf(name))
+            .commit()
         val disabledApps = SettingsHelper(context).excludedAppsFromBackgroundUpdateCheck
-        assertTrue(App.BRAVE in disabledApps)
+        assertTrue(app in disabledApps)
     }
 
     @Test
-    fun getDisableApps_withOneApp_FirefoxBeta_returnApps() {
-        sharedPreferences.edit().putStringSet("disableApps", setOf("FIREFOX_BETA")).commit()
-        val disabledApps = SettingsHelper(context).excludedAppsFromBackgroundUpdateCheck
-        assertTrue(App.FIREFOX_BETA in disabledApps)
-    }
-
-    @Test
-    fun getDisableApps_withOneApp_FirefoxFocus_returnApps() {
-        sharedPreferences.edit().putStringSet("disableApps", setOf("FIREFOX_FOCUS")).commit()
-        val disabledApps = SettingsHelper(context).excludedAppsFromBackgroundUpdateCheck
-        assertTrue(App.FIREFOX_FOCUS in disabledApps)
-    }
-
-    @Test
-    fun getDisableApps_withOneApp_FirefoxKlar_returnApps() {
-        sharedPreferences.edit().putStringSet("disableApps", setOf("FIREFOX_KLAR")).commit()
-        val disabledApps = SettingsHelper(context).excludedAppsFromBackgroundUpdateCheck
-        assertTrue(App.FIREFOX_KLAR in disabledApps)
-    }
-
-    @Test
-    fun getDisableApps_withOneApp_FirefoxNightly_returnApps() {
-        sharedPreferences.edit().putStringSet("disableApps", setOf("FIREFOX_NIGHTLY")).commit()
-        val disabledApps = SettingsHelper(context).excludedAppsFromBackgroundUpdateCheck
-        assertTrue(App.FIREFOX_NIGHTLY in disabledApps)
-    }
-
-    @Test
-    fun getDisableApps_withOneApp_FirefoxRelease_returnApps() {
-        sharedPreferences.edit().putStringSet("disableApps", setOf("FIREFOX_RELEASE")).commit()
-        val disabledApps = SettingsHelper(context).excludedAppsFromBackgroundUpdateCheck
-        assertTrue(App.FIREFOX_RELEASE in disabledApps)
-    }
-
-    @Test
-    fun getDisableApps_withOneApp_Iceraven_returnApps() {
-        sharedPreferences.edit().putStringSet("disableApps", setOf("ICERAVEN")).commit()
-        val disabledApps = SettingsHelper(context).excludedAppsFromBackgroundUpdateCheck
-        assertTrue(App.ICERAVEN in disabledApps)
-    }
-
-    @Test
-    fun getDisableApps_withOneApp_Lockwise_returnApps() {
-        sharedPreferences.edit().putStringSet("disableApps", setOf("LOCKWISE")).commit()
-        val disabledApps = SettingsHelper(context).excludedAppsFromBackgroundUpdateCheck
-        assertTrue(App.LOCKWISE in disabledApps)
-    }
-
-    @Test
-    fun getDisableApps_withInvalidApps_ignoreThem() {
-        sharedPreferences.edit().putStringSet("disableApps", setOf("invalid")).commit()
+    fun `excludedAppsFromBackgroundUpdateCheck with invalid value`() {
+        sharedPreferences.edit().putStringSet("background__update_check__excluded_apps", setOf("invalid"))
+            .commit()
         val disabledApps = SettingsHelper(context).excludedAppsFromBackgroundUpdateCheck
         assertTrue(disabledApps.isEmpty())
     }
 
     @Test
-    fun getDisableApps_withAllApps_returnApps() {
+    fun `excludedAppsFromBackgroundUpdateCheck with all apps`() {
         sharedPreferences.edit().putStringSet(
-            "disableApps",
+            "background__update_check__excluded_apps",
             setOf(
                 "BRAVE",
                 "FIREFOX_BETA",
@@ -375,18 +350,10 @@ class SettingsHelperTest {
                 "FFUPDATER"
             )
         ).commit()
-        assertTrue(SettingsHelper(context).excludedAppsFromBackgroundUpdateCheck.containsAll(App.values().toList()))
-    }
-
-    @Test
-    fun getDisableApps_withRemovedApps_returnEmptyList() {
-        sharedPreferences.edit().putStringSet(
-            "disableApps", setOf(
-                "FIREFOX_LITE",
-                "FIREFOX_NIGHTLY"
-            )
-        ).commit()
-        assertTrue(App.FIREFOX_NIGHTLY in SettingsHelper(context).excludedAppsFromBackgroundUpdateCheck)
+        assertEquals(
+            App.values().toList().sorted(),
+            SettingsHelper(context).excludedAppsFromBackgroundUpdateCheck.sorted()
+        )
     }
 
     @Test
@@ -403,7 +370,7 @@ class SettingsHelperTest {
 
     @Test
     fun getThemePreference_withInvalidValue_null_returnDefault() {
-        sharedPreferences.edit().putString("themePreference", null).commit()
+        sharedPreferences.edit().putString("foreground__theme_preference", null).commit()
 
         every { DeviceSdkTester.supportsAndroid10() } returns false
         assertEquals(MODE_NIGHT_AUTO_BATTERY, SettingsHelper(context).themePreference)
@@ -414,7 +381,7 @@ class SettingsHelperTest {
 
     @Test
     fun getThemePreference_withInvalidValue_emptyString_returnDefault() {
-        sharedPreferences.edit().putString("themePreference", "").commit()
+        sharedPreferences.edit().putString("foreground__theme_preference", "").commit()
 
         every { DeviceSdkTester.supportsAndroid10() } returns false
         assertEquals(MODE_NIGHT_AUTO_BATTERY, SettingsHelper(context).themePreference)
@@ -425,7 +392,7 @@ class SettingsHelperTest {
 
     @Test
     fun getThemePreference_withInvalidValue_text_returnDefault() {
-        sharedPreferences.edit().putString("themePreference", "lorem ipsum").commit()
+        sharedPreferences.edit().putString("foreground__theme_preference", "lorem ipsum").commit()
 
         every { DeviceSdkTester.supportsAndroid10() } returns false
         assertEquals(MODE_NIGHT_AUTO_BATTERY, SettingsHelper(context).themePreference)
@@ -436,7 +403,7 @@ class SettingsHelperTest {
 
     @Test
     fun getThemePreference_withInvalidValue_nonExistingNumber_returnDefault() {
-        sharedPreferences.edit().putString("themePreference", "6").commit()
+        sharedPreferences.edit().putString("foreground__theme_preference", "6").commit()
 
         every { DeviceSdkTester.supportsAndroid10() } returns false
         assertEquals(MODE_NIGHT_AUTO_BATTERY, SettingsHelper(context).themePreference)
@@ -447,7 +414,7 @@ class SettingsHelperTest {
 
     @Test
     fun getThemePreference_withValidValue_MODE_NIGHT_FOLLOW_SYSTEM_returnValue() {
-        sharedPreferences.edit().putString("themePreference", "-1").commit()
+        sharedPreferences.edit().putString("foreground__theme_preference", "-1").commit()
 
         every { DeviceSdkTester.supportsAndroid10() } returns false
         assertEquals(MODE_NIGHT_FOLLOW_SYSTEM, SettingsHelper(context).themePreference)
@@ -458,7 +425,7 @@ class SettingsHelperTest {
 
     @Test
     fun getThemePreference_withValidValue_MODE_NIGHT_NO_returnValue() {
-        sharedPreferences.edit().putString("themePreference", "1").commit()
+        sharedPreferences.edit().putString("foreground__theme_preference", "1").commit()
 
         every { DeviceSdkTester.supportsAndroid10() } returns false
         assertEquals(MODE_NIGHT_NO, SettingsHelper(context).themePreference)
@@ -469,7 +436,7 @@ class SettingsHelperTest {
 
     @Test
     fun getThemePreference_withValidValue_MODE_NIGHT_YES_returnValue() {
-        sharedPreferences.edit().putString("themePreference", "2").commit()
+        sharedPreferences.edit().putString("foreground__theme_preference", "2").commit()
 
         every { DeviceSdkTester.supportsAndroid10() } returns false
         assertEquals(MODE_NIGHT_YES, SettingsHelper(context).themePreference)
@@ -480,7 +447,7 @@ class SettingsHelperTest {
 
     @Test
     fun getThemePreference_withValidValue_MODE_NIGHT_AUTO_BATTERY_returnValue() {
-        sharedPreferences.edit().putString("themePreference", "3").commit()
+        sharedPreferences.edit().putString("foreground__theme_preference", "3").commit()
 
         every { DeviceSdkTester.supportsAndroid10() } returns false
         assertEquals(MODE_NIGHT_AUTO_BATTERY, SettingsHelper(context).themePreference)
