@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="settings__foreground_category__summary">Impostazioni quando l\'interfaccia utente è visibile.</string>
-    <string name="settings__background_category__summary">Impostazioni quando l\'app lavora in background ed è invisibile all'utente.</string>
+    <string name="settings__background_category__summary">Impostazioni quando l\'app lavora in background ed è invisibile all\'utente.</string>
     <string name="settings__background_category__title">Sfondo</string>
     <string name="settings__foreground_category__title">Primo piano</string>
     <string name="settings__background__update_check__excluded_apps__title">Escludere le app dal controllo degli aggiornamenti</string>
