@@ -95,7 +95,6 @@
     <string name="lockwise__description">PASSWORD ACCESS FOR YOU, &amp; ONLY YOU \n\nSecurely track your Firefox passwords &amp; access them anywhere. Quickly open any website from the app to get into your accounts</string>
     <string name="lockwise__title">Firefox Lockwise</string>
     <string name="main_activity__github_api_limit_exceeded">"<u>GitHub-API limit exceeded. Retry next hour.</u>"</string>
-    <string name="main_activity__no_internet_connection">No network connection</string>
     <string name="main_activity__no_unmetered_network">No unmetered network</string>
     <string name="main_activity__subtitle">Update your browsers from Mozilla</string>
     <string name="main_activity__temporary_network_issue">"<u>Temporary network issue. Retry later.</u>"</string>

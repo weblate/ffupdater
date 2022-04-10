@@ -13,7 +13,8 @@ object NetworkUtil {
     @AnyThread
     fun isInternetUnavailable(context: Context): Boolean {
         val cm = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-        return !isInternetAvailable(cm)
+        return false
+        // return !isInternetAvailable(cm)
     }
 
     private fun isInternetAvailable(cm: ConnectivityManager): Boolean {

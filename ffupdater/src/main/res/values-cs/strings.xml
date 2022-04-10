@@ -93,7 +93,6 @@
     <string name="lockwise__description">PŘÍSTUP K HESLŮM POUZE PRO VÁS \n\nBezpečně ukládá hesla, ať jste kdekoli. V aplikaci rychle otevřete jakoukoli stránku a přistupte ke svým účtům.</string>
     <string name="lockwise__title">Firefox Lockwise</string>
     <string name="main_activity__github_api_limit_exceeded">"<u>Limit GitHub-API byl překročen. Zkuste to prosím znovu během následující hodiny.</u>"</string>
-    <string name="main_activity__no_internet_connection">Bez přistupu k internetu</string>
     <string name="main_activity__no_unmetered_network">Žádná neměřená síť</string>
     <string name="main_activity__subtitle">Aktualizujte si svůj prohlížeč od Mozilly</string>
     <string name="main_activity__temporary_network_issue">"<u>Dočasný problém se sítí. Zkuste to prosím později.</u>"</string>

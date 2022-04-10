@@ -93,7 +93,6 @@
     <string name="lockwise__description">PASSWORD ACCESS FOR YOU, &amp; ONLY YOU \n\nSecurely track your Firefox passwords &amp; access them anywhere. Quickly open any website from the app to get into your accounts</string>
     <string name="lockwise__title">Firefox Lockwise</string>
     <string name="main_activity__github_api_limit_exceeded">"<u>GitHub-APIの制限を超えました。次の時間に再試行します。</u>"</string>
-    <string name="main_activity__no_internet_connection">ネットワーク接続がありません</string>
     <string name="main_activity__no_unmetered_network">アンメットネットワークなし</string>
     <string name="main_activity__subtitle">あなたのブラウザをアップデートします</string>
     <string name="main_activity__temporary_network_issue">"<u>一時的なネットワークの問題です。後で再試行します。</u>"</string>

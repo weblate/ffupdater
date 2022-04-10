@@ -93,7 +93,6 @@
     <string name="lockwise__description">ДОСТУП ПАРОЛЯ ДЛЯ ВАС, І ТОЛЬКО ВАС  Безпечно відстежуйте ваші паролі Firefox та отримуйте доступ до них будь-де. Швидко відкрийте будь-який веб-сайт із програми, щоб увійти до своїх облікових записів</string>
     <string name="lockwise__title">Firefox Lockwise</string>
     <string name="main_activity__github_api_limit_exceeded">"<u>Перевищено ліміт GitHub-API. Повторіть спробу наступної години.</u>"</string>
-    <string name="main_activity__no_internet_connection">Ви не підключені до Інтернету</string>
     <string name="main_activity__no_unmetered_network">Немає мережі без обліку</string>
     <string name="main_activity__subtitle">Оновіть веб-переглядачі від Mozilla</string>
     <string name="main_activity__temporary_network_issue">"<u>Тимчасова проблема з мережею. Повторіть спробу пізніше.</u>"</string>

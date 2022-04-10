@@ -25,7 +25,11 @@ import de.marmaro.krt.ffupdater.app.UpdateCheckResult
 import de.marmaro.krt.ffupdater.app.impl.exceptions.GithubRateLimitExceededException
 import de.marmaro.krt.ffupdater.app.impl.exceptions.NetworkException
 import de.marmaro.krt.ffupdater.crash.CrashListener
-import de.marmaro.krt.ffupdater.download.*
+import de.marmaro.krt.ffupdater.download.AppCache
+import de.marmaro.krt.ffupdater.download.AppDownloadStatus
+import de.marmaro.krt.ffupdater.download.FileDownloader
+import de.marmaro.krt.ffupdater.download.NetworkUtil.isNetworkMetered
+import de.marmaro.krt.ffupdater.download.StorageUtil
 import de.marmaro.krt.ffupdater.installer.AppInstaller
 import de.marmaro.krt.ffupdater.security.FingerprintValidator
 import de.marmaro.krt.ffupdater.security.FingerprintValidator.CertificateValidationResult
@@ -261,7 +265,7 @@ class InstallActivity : AppCompatActivity() {
             ia.setText(R.id.fetchUrlTextView, runningText)
 
             // check if network type requirements are met
-            if (!ia.settingsHelper.isForegroundUpdateCheckOnMeteredAllowed && NetworkUtil.isNetworkMetered(ia)) {
+            if (!ia.settingsHelper.isForegroundUpdateCheckOnMeteredAllowed && isNetworkMetered(ia)) {
                 ia.viewModel.error = Pair(R.string.main_activity__no_unmetered_network, null)
                 return FAILURE_SHOW_FETCH_URL_EXCEPTION
             }
@@ -296,7 +300,7 @@ class InstallActivity : AppCompatActivity() {
 
         @MainThread
         suspend fun startDownload(ia: InstallActivity): State {
-            if (!ia.settingsHelper.isForegroundDownloadOnMeteredAllowed && NetworkUtil.isNetworkMetered(ia)) {
+            if (!ia.settingsHelper.isForegroundDownloadOnMeteredAllowed && isNetworkMetered(ia)) {
                 ia.viewModel.error = Pair(R.string.main_activity__no_unmetered_network, null)
                 return FAILURE_SHOW_FETCH_URL_EXCEPTION
             }

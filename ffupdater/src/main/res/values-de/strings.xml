@@ -93,7 +93,6 @@
     <string name="lockwise__description">PASSWORT-ZUGANG FÜR SIE, &amp; NUR SIE Verfolgen Sie Ihre Firefox-Passwörter sicher und greifen Sie überall darauf zu Schnelles Öffnen einer beliebigen Website aus der Anwendung heraus, um in Ihre Konten zu gelangen</string>
     <string name="lockwise__title">Firefox Lockwise</string>
     <string name="main_activity__github_api_limit_exceeded">"<u>GitHub-API-Limit überschritten. Nächste Stunde erneut versuchen.</u>"</string>
-    <string name="main_activity__no_internet_connection">Sie sind nicht mit dem Internet verbunden</string>
     <string name="main_activity__no_unmetered_network">Kein ungebremstes Netz</string>
     <string name="main_activity__subtitle">Aktualisieren Sie Ihre Browser von Mozilla</string>
     <string name="main_activity__temporary_network_issue">"<u>Vorübergehendes Netzwerkproblem. Später erneut versuchen.</u>"</string>

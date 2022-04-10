@@ -29,8 +29,8 @@ import de.marmaro.krt.ffupdater.dialog.AppInfoDialog
 import de.marmaro.krt.ffupdater.dialog.InstallNewAppDialog
 import de.marmaro.krt.ffupdater.dialog.InstallSameVersionDialog
 import de.marmaro.krt.ffupdater.dialog.RunningDownloadsDialog
-import de.marmaro.krt.ffupdater.download.AppDownloadStatus
-import de.marmaro.krt.ffupdater.download.NetworkUtil
+import de.marmaro.krt.ffupdater.download.AppDownloadStatus.Companion.areDownloadsInBackgroundActive
+import de.marmaro.krt.ffupdater.download.NetworkUtil.isNetworkMetered
 import de.marmaro.krt.ffupdater.security.StrictModeSetup
 import de.marmaro.krt.ffupdater.settings.DataStoreHelper
 import de.marmaro.krt.ffupdater.settings.SettingsHelper
@@ -180,11 +180,7 @@ class MainActivity : AppCompatActivity() {
             hideLoadAnimation()
             showToast(message)
         }
-        if (NetworkUtil.isInternetUnavailable(this)) {
-            abortUpdateCheck(R.string.main_activity__no_internet_connection)
-            return
-        }
-        if (!settingsHelper.isForegroundUpdateCheckOnMeteredAllowed && NetworkUtil.isNetworkMetered(this)) {
+        if (!settingsHelper.isForegroundUpdateCheckOnMeteredAllowed && isNetworkMetered(this)) {
             abortUpdateCheck(R.string.main_activity__no_unmetered_network)
             return
         }
@@ -232,15 +228,11 @@ class MainActivity : AppCompatActivity() {
 
     @MainThread
     fun installApp(app: App, askForConfirmationIfOtherDownloadsAreRunning: Boolean = false) {
-        if (NetworkUtil.isInternetUnavailable(this)) {
-            showToast(R.string.main_activity__no_internet_connection)
-            return
-        }
-        if (!settingsHelper.isForegroundUpdateCheckOnMeteredAllowed && NetworkUtil.isNetworkMetered(this)) {
+        if (!settingsHelper.isForegroundUpdateCheckOnMeteredAllowed && isNetworkMetered(this)) {
             showToast(R.string.main_activity__no_unmetered_network)
             return
         }
-        if (askForConfirmationIfOtherDownloadsAreRunning && AppDownloadStatus.areDownloadsInBackgroundActive()) {
+        if (askForConfirmationIfOtherDownloadsAreRunning && areDownloadsInBackgroundActive()) {
             RunningDownloadsDialog.newInstance(app).show(supportFragmentManager)
             return
         }

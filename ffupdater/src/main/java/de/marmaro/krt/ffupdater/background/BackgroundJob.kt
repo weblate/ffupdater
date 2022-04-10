@@ -102,7 +102,10 @@ class BackgroundJob(context: Context, workerParams: WorkerParameters) :
             return Result.retry()
         }
 
-        if (!settingsHelper.isBackgroundUpdateCheckOnMeteredAllowed && isNetworkMetered()) {
+        if (!settingsHelper.isBackgroundUpdateCheckOnMeteredAllowed && NetworkUtil.isNetworkMetered(
+                applicationContext
+            )
+        ) {
             Log.i(LOG_TAG, "No unmetered network available for update check.")
             return Result.retry()
         }
@@ -127,7 +130,10 @@ class BackgroundJob(context: Context, workerParams: WorkerParameters) :
             return Result.success()
         }
 
-        if (!settingsHelper.isBackgroundDownloadOnMeteredAllowed && isNetworkMetered()) {
+        if (!settingsHelper.isBackgroundDownloadOnMeteredAllowed && NetworkUtil.isNetworkMetered(
+                applicationContext
+            )
+        ) {
             Log.i(LOG_TAG, "No unmetered network available for download.")
             return Result.success()
         }
@@ -192,10 +198,6 @@ class BackgroundJob(context: Context, workerParams: WorkerParameters) :
     private fun showErrorNotification(e: Exception) {
         val message = applicationContext.getString(R.string.background_job_failure__notification_text)
         NotificationBuilder.showErrorNotification(applicationContext, e, message)
-    }
-
-    private fun isNetworkMetered(): Boolean {
-        return NetworkUtil.isNetworkMetered(applicationContext)
     }
 
     companion object {

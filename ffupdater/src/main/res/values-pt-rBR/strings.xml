@@ -93,7 +93,6 @@
     <string name="lockwise__description">ACESSO VIA SENHA, &amp; APENAS VOCÊ \n\nGerencie com segurança suas senhas do Firefox &amp; acesse-as em qualquer lugar. Abra rapidamente qualquer site via app para entrar em suas contas</string>
     <string name="lockwise__title">Firefox Lockwise</string>
     <string name="main_activity__github_api_limit_exceeded">"<u>O limite de consultas do API do GitHub foi excedido. Tente outra vez mais tarde.</u>"</string>
-    <string name="main_activity__no_internet_connection">Sem conexão à Internet</string>
     <string name="main_activity__no_unmetered_network">Nenhuma rede não contatada</string>
     <string name="main_activity__subtitle">Atualize seus navegadores</string>
     <string name="main_activity__temporary_network_issue">"<u>Problema temporário da rede. Tente outra vez mais tarde.</u>"</string>

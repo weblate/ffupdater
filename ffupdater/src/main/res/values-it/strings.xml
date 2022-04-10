@@ -109,7 +109,6 @@
     <string name="lockwise__description">ACCESSO TRAMITE PASSWORD PER TE E SOLO TE \n\nTraccia in modo sicuro le tue password di Firefox e accedi a esse ovunque. Apri rapidamente qualsiasi sito web dall\'app per entrare nei tuoi account</string>
     <string name="lockwise__title">Firefox Lockwise</string>
     <string name="main_activity__github_api_limit_exceeded">"<u>Limite di GitHub-API superato. Si prega di provare di nuovo il download tra un\'ora.</u>"</string>
-    <string name="main_activity__no_internet_connection">Nessuna connessione di rete</string>
     <string name="main_activity__subtitle">Aggiorna i tuoi browser di Mozilla</string>
     <string name="main_activity__temporary_network_issue">"<u>Problema di rete temporaneo. Riprovare più tardi.</u>"</string>
     <string name="manage_storage_activity__delete_button">Elimina gli aggiornamenti delle app in cache.</string>

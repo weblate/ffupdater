@@ -93,7 +93,6 @@
     <string name="lockwise__description">UN ACCÈS PAR MOT DE PASSE QUI VOUS EST RÉSERVÉ Suivez vos mots de passe en toute sécurité sur Firefox et accédez-y partout Ouvrez rapidement n’importe quel site Internet de l’application pour accéder à vos comptes</string>
     <string name="lockwise__title">Firefox Lockwise</string>
     <string name="main_activity__github_api_limit_exceeded">"<u>La limite de GitHub-API est dépassée. Réessayez l\'heure suivante.</u>"</string>
-    <string name="main_activity__no_internet_connection">Vous n\'êtes pas connecté à internet</string>
     <string name="main_activity__no_unmetered_network">Pas de réseau non mesuré</string>
     <string name="main_activity__subtitle">Mettez à jour vos navigateurs à partir de Mozilla</string>
     <string name="main_activity__temporary_network_issue">"<u>Problème de réseau temporaire. Réessayez plus tard.</u>"</string>
