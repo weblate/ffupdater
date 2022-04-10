@@ -222,7 +222,7 @@ class InstallActivity : AppCompatActivity() {
         const val EXTRA_APP_NAME = "app_name"
 
         @MainThread
-        suspend fun start(ia: InstallActivity): State {
+        fun start(ia: InstallActivity): State {
             if (!ia.app.detail.isInstalled(ia) || ia.fingerprintValidator.checkInstalledApp(ia.app).isValid) {
                 return CHECK_IF_STORAGE_IS_MOUNTED
             }
@@ -432,7 +432,7 @@ class InstallActivity : AppCompatActivity() {
         }
 
         @MainThread
-        suspend fun appInstallationHasBeenRegistered(ia: InstallActivity): State {
+        fun appInstallationHasBeenRegistered(ia: InstallActivity): State {
             ia.show(R.id.verifyInstalledFingerprint)
             val fingerprint = ia.fingerprintValidator.checkInstalledApp(ia.app)
             ia.appFingerprint = fingerprint
