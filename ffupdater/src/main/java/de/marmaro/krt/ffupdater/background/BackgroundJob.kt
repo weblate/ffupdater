@@ -112,7 +112,7 @@ class BackgroundJob(context: Context, workerParams: WorkerParameters) :
 
     private suspend fun checkForUpdates(): List<App> {
         val apps = App.values()
-            .filter { it !in settingsHelper.disabledApps }
+            .filter { it !in settingsHelper.excludedAppsFromBackgroundUpdateCheck }
             .filter { it.detail.isInstalled(applicationContext) }
         val appsWithAvailableUpdates = apps.filter {
             val updateCheckResult = it.detail.updateCheck(applicationContext)

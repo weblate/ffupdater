@@ -57,7 +57,7 @@ class MainActivity : AppCompatActivity() {
         }
         settingsHelper = SettingsHelper(this)
         AppCompatDelegate.setDefaultNightMode(settingsHelper.themePreference)
-        Migrator().migrate(this)
+        Migrator(this).migrate()
 
         val deviceAbis = DeviceAbiExtractor.findSupportedAbis()
         findViewById<View>(R.id.installAppButton).setOnClickListener {

@@ -29,7 +29,7 @@ class SettingsHelper(context: Context) {
 
     val themePreference: Int
         get() {
-            val theme = preferences.getString("themePreference", null)?.toIntOrNull()
+            val theme = preferences.getString("foreground__theme_preference", null)?.toIntOrNull()
             return when {
                 theme in validAndroidThemes -> theme!!
                 // return default values because theme is invalid and could be null
@@ -73,9 +73,9 @@ class SettingsHelper(context: Context) {
      *
      * @return the regular background update check should ignore these apps
      */
-    val disabledApps: List<App>
+    val excludedAppsFromBackgroundUpdateCheck: List<App>
         get() {
-            val disableApps = preferences.getStringSet("disableApps", null) ?: setOf()
+            val disableApps = preferences.getStringSet("background__update_check__excluded_apps", null) ?: setOf()
             return disableApps.mapNotNull {
                 try {
                     App.valueOf(it)
@@ -83,11 +83,5 @@ class SettingsHelper(context: Context) {
                     null
                 }
             }
-        }
-
-    @Deprecated("entfernen")
-    val onlyUnmeteredNetwork: Boolean
-        get() {
-            return preferences.getBoolean("onlyUnmeteredNetwork", false)
         }
 }

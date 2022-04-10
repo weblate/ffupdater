@@ -21,9 +21,9 @@
 
         <ListPreference
             app:defaultValue="@string/default_theme_preference"
-            app:entries="@array/themeEntries"
-            app:entryValues="@array/themeValues"
-            app:key="themePreference"
+            app:entries="@array/foreground__theme_preference__entries"
+            app:entryValues="@array/foreground__theme_preference__values"
+            app:key="foreground__theme_preference"
             app:singleLineTitle="false"
             app:summary="@string/settings__theme_preference_summary"
             app:title="@string/settings__theme_preference_title" />
@@ -45,12 +45,21 @@
         <ListPreference
             app:defaultValue="360"
             app:dependency="background__update_check__enabled"
-            app:entries="@array/checkIntervalEntries"
-            app:entryValues="@array/checkIntervalValues"
+            app:entries="@array/background__update_check__interval__entries"
+            app:entryValues="@array/background__update_check__interval__values"
             app:key="background__update_check__interval"
             app:singleLineTitle="false"
             app:title="Update check interval"
             app:useSimpleSummaryProvider="true" />
+
+        <MultiSelectListPreference
+            app:dependency="background__update_check__enabled"
+            app:entries="@array/background__update_check__excluded_apps__entries"
+            app:entryValues="@array/background__update_check__excluded_apps__values"
+            app:key="background__update_check__excluded_apps"
+            app:summary="Useful if you don't want to update an app and don't want to receive update notifications for it."
+            app:singleLineTitle="false"
+            app:title="Exclude apps from update check" />
 
         <SwitchPreferenceCompat
             app:defaultValue="true"
@@ -86,38 +95,5 @@
 
 
     </de.marmaro.krt.ffupdater.settings.LongSummaryPreferenceCategory>
-
-    <PreferenceCategory app:title="@string/settings__title">
-
-        <SwitchPreferenceCompat
-            app:defaultValue="true"
-            app:key="automaticCheck"
-            app:title="@string/settings__automatic_check_title" />
-
-        <SwitchPreferenceCompat
-            app:defaultValue="false"
-            app:key="onlyUnmeteredNetwork"
-            app:summary="@string/settings__only_unmetered_network_summary"
-            app:title="@string/settings__ony_unmetered_network_title" />
-
-        <ListPreference
-            app:defaultValue="360"
-            app:dependency="automaticCheck"
-            app:entries="@array/checkIntervalEntries"
-            app:entryValues="@array/checkIntervalValues"
-            app:key="checkInterval"
-            app:summary="@string/settings__check_interval_summary"
-            app:title="@string/settings__check_interval_title"
-            app:useSimpleSummaryProvider="true" />
-
-        <MultiSelectListPreference
-            app:dependency="automaticCheck"
-            app:entries="@array/disabledAppEntries"
-            app:entryValues="@array/disabledAppEntryValues"
-            app:key="disableApps"
-            app:summary="@string/settings__disabled_apps_summary"
-            app:title="@string/settings__disabled_apps_title" />
-
-    </PreferenceCategory>
 
 </PreferenceScreen>

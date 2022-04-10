@@ -278,81 +278,81 @@ class SettingsHelperTest {
 
     @Test
     fun getDisableApps_userHasNotChangedSetting_returnEmptySet() {
-        assertTrue(SettingsHelper(context).disabledApps.isEmpty())
+        assertTrue(SettingsHelper(context).excludedAppsFromBackgroundUpdateCheck.isEmpty())
     }
 
     @Test
     fun getDisableApps_withValue_null_returnEmptySet() {
         sharedPreferences.edit().putStringSet("disabledApps", null).commit()
-        assertTrue(SettingsHelper(context).disabledApps.isEmpty())
+        assertTrue(SettingsHelper(context).excludedAppsFromBackgroundUpdateCheck.isEmpty())
     }
 
     @Test
     fun getDisableApps_withEmptySet_returnEmptySet() {
         sharedPreferences.edit().putStringSet("disabledApps", setOf()).commit()
-        assertTrue(SettingsHelper(context).disabledApps.isEmpty())
+        assertTrue(SettingsHelper(context).excludedAppsFromBackgroundUpdateCheck.isEmpty())
     }
 
     @Test
     fun getDisableApps_withOneApp_Brave_returnApps() {
         sharedPreferences.edit().putStringSet("disableApps", setOf("BRAVE")).commit()
-        val disabledApps = SettingsHelper(context).disabledApps
+        val disabledApps = SettingsHelper(context).excludedAppsFromBackgroundUpdateCheck
         assertTrue(App.BRAVE in disabledApps)
     }
 
     @Test
     fun getDisableApps_withOneApp_FirefoxBeta_returnApps() {
         sharedPreferences.edit().putStringSet("disableApps", setOf("FIREFOX_BETA")).commit()
-        val disabledApps = SettingsHelper(context).disabledApps
+        val disabledApps = SettingsHelper(context).excludedAppsFromBackgroundUpdateCheck
         assertTrue(App.FIREFOX_BETA in disabledApps)
     }
 
     @Test
     fun getDisableApps_withOneApp_FirefoxFocus_returnApps() {
         sharedPreferences.edit().putStringSet("disableApps", setOf("FIREFOX_FOCUS")).commit()
-        val disabledApps = SettingsHelper(context).disabledApps
+        val disabledApps = SettingsHelper(context).excludedAppsFromBackgroundUpdateCheck
         assertTrue(App.FIREFOX_FOCUS in disabledApps)
     }
 
     @Test
     fun getDisableApps_withOneApp_FirefoxKlar_returnApps() {
         sharedPreferences.edit().putStringSet("disableApps", setOf("FIREFOX_KLAR")).commit()
-        val disabledApps = SettingsHelper(context).disabledApps
+        val disabledApps = SettingsHelper(context).excludedAppsFromBackgroundUpdateCheck
         assertTrue(App.FIREFOX_KLAR in disabledApps)
     }
 
     @Test
     fun getDisableApps_withOneApp_FirefoxNightly_returnApps() {
         sharedPreferences.edit().putStringSet("disableApps", setOf("FIREFOX_NIGHTLY")).commit()
-        val disabledApps = SettingsHelper(context).disabledApps
+        val disabledApps = SettingsHelper(context).excludedAppsFromBackgroundUpdateCheck
         assertTrue(App.FIREFOX_NIGHTLY in disabledApps)
     }
 
     @Test
     fun getDisableApps_withOneApp_FirefoxRelease_returnApps() {
         sharedPreferences.edit().putStringSet("disableApps", setOf("FIREFOX_RELEASE")).commit()
-        val disabledApps = SettingsHelper(context).disabledApps
+        val disabledApps = SettingsHelper(context).excludedAppsFromBackgroundUpdateCheck
         assertTrue(App.FIREFOX_RELEASE in disabledApps)
     }
 
     @Test
     fun getDisableApps_withOneApp_Iceraven_returnApps() {
         sharedPreferences.edit().putStringSet("disableApps", setOf("ICERAVEN")).commit()
-        val disabledApps = SettingsHelper(context).disabledApps
+        val disabledApps = SettingsHelper(context).excludedAppsFromBackgroundUpdateCheck
         assertTrue(App.ICERAVEN in disabledApps)
     }
 
     @Test
     fun getDisableApps_withOneApp_Lockwise_returnApps() {
         sharedPreferences.edit().putStringSet("disableApps", setOf("LOCKWISE")).commit()
-        val disabledApps = SettingsHelper(context).disabledApps
+        val disabledApps = SettingsHelper(context).excludedAppsFromBackgroundUpdateCheck
         assertTrue(App.LOCKWISE in disabledApps)
     }
 
     @Test
     fun getDisableApps_withInvalidApps_ignoreThem() {
         sharedPreferences.edit().putStringSet("disableApps", setOf("invalid")).commit()
-        val disabledApps = SettingsHelper(context).disabledApps
+        val disabledApps = SettingsHelper(context).excludedAppsFromBackgroundUpdateCheck
         assertTrue(disabledApps.isEmpty())
     }
 
@@ -375,7 +375,7 @@ class SettingsHelperTest {
                 "FFUPDATER"
             )
         ).commit()
-        assertTrue(SettingsHelper(context).disabledApps.containsAll(App.values().toList()))
+        assertTrue(SettingsHelper(context).excludedAppsFromBackgroundUpdateCheck.containsAll(App.values().toList()))
     }
 
     @Test
@@ -386,7 +386,7 @@ class SettingsHelperTest {
                 "FIREFOX_NIGHTLY"
             )
         ).commit()
-        assertTrue(App.FIREFOX_NIGHTLY in SettingsHelper(context).disabledApps)
+        assertTrue(App.FIREFOX_NIGHTLY in SettingsHelper(context).excludedAppsFromBackgroundUpdateCheck)
     }
 
     @Test
