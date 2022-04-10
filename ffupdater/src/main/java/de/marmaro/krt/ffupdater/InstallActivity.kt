@@ -227,7 +227,9 @@ class InstallActivity : AppCompatActivity() {
 
         @MainThread
         fun start(ia: InstallActivity): State {
-            if (!ia.app.detail.isInstalled(ia) || ia.fingerprintValidator.checkInstalledApp(ia.app).isValid) {
+            if (!ia.app.detail.isInstalled(ia) ||
+                ia.fingerprintValidator.checkInstalledApp(ia.app.detail).isValid
+            ) {
                 return CHECK_IF_STORAGE_IS_MOUNTED
             }
             return FAILURE_UNKNOWN_SIGNATURE_OF_INSTALLED_APP
@@ -384,7 +386,7 @@ class InstallActivity : AppCompatActivity() {
             ia.setText(R.id.downloadedFileUrl, updateCheckResult.downloadUrl)
             ia.show(R.id.verifyDownloadFingerprint)
 
-            val fingerprint = ia.fingerprintValidator.checkApkFile(ia.appCache.getFile(ia), app)
+            val fingerprint = ia.fingerprintValidator.checkApkFile(ia.appCache.getFile(ia), app.detail)
             ia.fileFingerprint = fingerprint
 
             if (fingerprint.isValid) {
@@ -401,7 +403,7 @@ class InstallActivity : AppCompatActivity() {
             ia.setText(R.id.useCachedDownloadedApk__path, ia.appCache.getFile(ia).absolutePath)
             ia.show(R.id.verifyDownloadFingerprint)
 
-            val fingerprint = ia.fingerprintValidator.checkApkFile(ia.appCache.getFile(ia), app)
+            val fingerprint = ia.fingerprintValidator.checkApkFile(ia.appCache.getFile(ia), app.detail)
             ia.fileFingerprint = fingerprint
             return if (fingerprint.isValid) {
                 FINGERPRINT_OF_DOWNLOADED_FILE_OK
@@ -438,7 +440,7 @@ class InstallActivity : AppCompatActivity() {
         @MainThread
         fun appInstallationHasBeenRegistered(ia: InstallActivity): State {
             ia.show(R.id.verifyInstalledFingerprint)
-            val fingerprint = ia.fingerprintValidator.checkInstalledApp(ia.app)
+            val fingerprint = ia.fingerprintValidator.checkInstalledApp(ia.app.detail)
             ia.appFingerprint = fingerprint
             ia.hide(R.id.verifyInstalledFingerprint)
             return if (fingerprint.isValid) {
