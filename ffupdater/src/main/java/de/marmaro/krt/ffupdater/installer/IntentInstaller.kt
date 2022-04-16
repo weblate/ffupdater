@@ -37,6 +37,7 @@ class IntentInstaller(
      * https://github.com/f-droid/fdroidclient
      */
     private fun installInternal(activity: Activity, downloadedFile: File) {
+        throw RuntimeException("This code should not be called")
         @Suppress("DEPRECATION")
         val intent = Intent(Intent.ACTION_INSTALL_PACKAGE)
         intent.data = Uri.fromFile(downloadedFile)

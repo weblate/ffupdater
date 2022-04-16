@@ -2,7 +2,6 @@ package de.marmaro.krt.ffupdater
 
 import android.content.Context
 import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
 import android.os.Environment
 import android.view.MenuItem
@@ -108,11 +107,11 @@ class InstallActivity : AppCompatActivity() {
             hide(R.id.install_activity__delete_cache)
         }
         findViewById<Button>(R.id.install_activity__open_cache_folder_button).setOnClickListener {
-            val intent = Intent(Intent.ACTION_VIEW)
-            val parentFolder = appCache.getFile(this).parentFile ?: return@setOnClickListener
-            val uri = Uri.parse("file://${parentFolder.absolutePath}")
-            intent.setDataAndType(uri, "resource/folder")
-            startActivity(Intent.createChooser(intent, "Open folder"))
+//            val intent = Intent(Intent.ACTION_VIEW)
+//            val parentFolder = appCache.getFile(this).parentFile ?: return@setOnClickListener
+//            val uri = Uri.parse("file://${parentFolder.absolutePath}")
+//            intent.setDataAndType(uri, "resource/folder")
+//            startActivity(Intent.createChooser(intent, "Open folder"))
         }
 
         // make sure that the ViewModel is correct for the current app
